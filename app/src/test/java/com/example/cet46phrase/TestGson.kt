@@ -21,13 +21,30 @@ class TestGson {
     @Test
     fun read() {
         val file = File("C:\\Users\\gliuy\\Desktop\\outJson.json")
+        val gson = Gson()
         val fileReader = FileReader(file)
         val bufferReader = BufferedReader(fileReader)
         var count = 0
+        val unitMap: MutableMap<String, MutableList<String>> = mutableMapOf()
         bufferReader.lines().forEach {
+            if (it != null) {
+                val map = gson.fromJson<MutableMap<String, Any>>(it, MutableMap::class.java)
+                val unit = map["unit"] as String
+                val type = map["type"] as String
+                var list = unitMap[type]
+                if (list == null) {
+                    list = mutableListOf()
+                    unitMap.put(type, list)
+                }
+                if (!list.contains(unit)) {
+                    list.add(unit)
+                }
+            }
             count++
         }
         println("count = ${count}")
+        println("unitMap = ${gson.toJson(unitMap)}")
+
         bufferReader.close()
         fileReader.close()
     }

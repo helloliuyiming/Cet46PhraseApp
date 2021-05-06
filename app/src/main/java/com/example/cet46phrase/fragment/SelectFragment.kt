@@ -1,6 +1,5 @@
 package com.example.cet46phrase.fragment
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,23 +10,21 @@ import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cet46phrase.R
-import com.example.cet46phrase.databinding.FragmentMainBinding
-import com.example.cet46phrase.viewmodel.FragmentMainViewModel
+import com.example.cet46phrase.databinding.FragmentSelectBinding
+import com.example.cet46phrase.viewmodel.FragmentSelectViewModel
 
+class SelectFragment : Fragment() {
 
-class MainFragment : Fragment() {
-
-    lateinit var dataBinding: FragmentMainBinding
-    lateinit var viewModel: FragmentMainViewModel
+    lateinit var viewModel: FragmentSelectViewModel
+    lateinit var dataBinding: FragmentSelectBinding
     lateinit var adapter: RecyclerView.Adapter<PhraseUnitViewHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(FragmentMainViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(FragmentSelectViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -35,13 +32,12 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         dataBinding =
-            DataBindingUtil.inflate(layoutInflater, R.layout.fragment_main, container, false)
+            DataBindingUtil.inflate(layoutInflater, R.layout.fragment_select, container, false)
         return dataBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        check()
         initView()
         initListener()
         onSubscribe()
@@ -49,7 +45,7 @@ class MainFragment : Fragment() {
     }
 
     private fun initView() {
-        dataBinding.rvBoard.layoutManager = LinearLayoutManager(context)
+        dataBinding.rvUnit.layoutManager = LinearLayoutManager(context)
         adapter = object : RecyclerView.Adapter<PhraseUnitViewHolder>() {
             override fun onCreateViewHolder(
                 parent: ViewGroup,
@@ -60,40 +56,55 @@ class MainFragment : Fragment() {
             }
 
             override fun onBindViewHolder(holder: PhraseUnitViewHolder, position: Int) {
+                if (viewModel.unitListLiveData.value == null) {
+                    return
+                }
+                var mPosition = position
+                var itemType = ""
+                var itemUnit = ""
+                viewModel.unitListLiveData.value!!.forEach {
+                    try {
+                        if (mPosition < it.value.size) {
+                            itemUnit = it.value[mPosition]
+                            itemType = it.key
+                        } else {
+                            mPosition -= it.value.size
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
 
+                }
+
+                holder.type?.text = itemType
+                holder.unit?.text = itemUnit
             }
 
             override fun getItemCount(): Int {
-                return if (viewModel.followUnitLiveData.value == null) 0 else viewModel.followUnitLiveData.value!!.size
+                if (viewModel.unitListLiveData.value == null) {
+                    return 0
+                }
+                var count = 0
+                viewModel.unitListLiveData.value!!.forEach {
+                    count += it.value.size
+                }
+                return count
             }
 
         }
-        dataBinding.rvBoard.adapter = adapter
-
+        dataBinding.rvUnit.adapter = adapter
     }
 
     private fun initListener() {
-        dataBinding.btnEdit.setOnClickListener { findNavController().navigate(R.id.action_mainFragment_to_selectFragment) }
+
     }
 
     private fun onSubscribe() {
-        viewModel.followUnitLiveData.observe(viewLifecycleOwner) {
-            if (it == null) {
-                findNavController().navigate(R.id.action_mainFragment_to_selectFragment)
-                return@observe
-            }
+        viewModel.unitListLiveData.observe(viewLifecycleOwner) {
             adapter.notifyDataSetChanged()
         }
     }
 
-    private fun check() {
-        val sharedPreferences =
-            requireContext().getSharedPreferences("config", Context.MODE_PRIVATE)
-        val init = sharedPreferences.getBoolean("init", false)
-        if (!init) {
-            findNavController().navigate(R.id.action_mainFragment_to_loadDataFragment)
-        }
-    }
 
     inner class PhraseUnitViewHolder(itemView: View, viewType: Int) :
         RecyclerView.ViewHolder(itemView) {

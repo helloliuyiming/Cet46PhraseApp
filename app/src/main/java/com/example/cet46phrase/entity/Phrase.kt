@@ -2,8 +2,10 @@ package com.example.cet46phrase.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 
 @Entity
+@TypeConverters(TypeConverter::class)
 class Phrase {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
@@ -16,9 +18,9 @@ class Phrase {
     lateinit var unit: String
 }
 
-@Entity
 class Explain {
+    //    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0
     lateinit var explain: String
     var examples: MutableList<String> = mutableListOf()
-
 }
