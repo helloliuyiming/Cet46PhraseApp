@@ -1,5 +1,6 @@
 package com.example.cet46phrase.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,14 +8,17 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cet46phrase.R
 import com.example.cet46phrase.databinding.FragmentSelectBinding
 import com.example.cet46phrase.viewmodel.FragmentSelectViewModel
+import com.google.gson.Gson
 
 class SelectFragment : Fragment() {
 
@@ -76,8 +80,22 @@ class SelectFragment : Fragment() {
 
                 }
 
-                holder.type?.text = itemType
+                holder.type?.text = itemType.replace("_phrase", "")
                 holder.unit?.text = itemUnit
+                holder.itemView.setOnClickListener {
+                    val gson = Gson()
+                    val followsUnit: MutableMap<String, MutableList<String>> = mutableMapOf()
+                    val preferences =
+                        requireContext().getSharedPreferences("config", Context.MODE_PRIVATE)
+                    val edit = preferences.edit()
+                    val list = mutableListOf<String>()
+                    list.add(itemUnit)
+                    followsUnit[itemType] = list
+                    edit.putString("follows", gson.toJson(followsUnit))
+                    edit.apply()
+                    Toast.makeText(context, "切换到$itemType $itemUnit", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
+                }
             }
 
             override fun getItemCount(): Int {
