@@ -60,11 +60,34 @@ class MainFragment : Fragment() {
             }
 
             override fun onBindViewHolder(holder: PhraseUnitViewHolder, position: Int) {
+                if (viewModel.followUnitLiveData.value == null) {
+                    return
+                }
+                var mPosition = position
+                var itemType = ""
+                var itemUnit = ""
+                viewModel.followUnitLiveData.value!!.forEach {
+                    if (mPosition < it.value.size) {
+                        itemUnit = it.value[mPosition]
+                        itemType = it.key
+                    } else {
+                        mPosition -= it.value.size
+                    }
+                }
 
+                holder.type?.text = itemType.replace("_phrase", "")
+                holder.unit?.text = itemUnit
             }
 
             override fun getItemCount(): Int {
-                return if (viewModel.followUnitLiveData.value == null) 0 else viewModel.followUnitLiveData.value!!.size
+                if (viewModel.followUnitLiveData.value == null) {
+                    return 0
+                }
+                var count = 0
+                viewModel.followUnitLiveData.value!!.forEach {
+                    count += it.value.size
+                }
+                return count
             }
 
         }
@@ -74,6 +97,7 @@ class MainFragment : Fragment() {
 
     private fun initListener() {
         dataBinding.btnEdit.setOnClickListener { findNavController().navigate(R.id.action_mainFragment_to_selectFragment) }
+        dataBinding.btnAction.setOnClickListener { findNavController().navigate(R.id.action_mainFragment_to_learnFragment) }
     }
 
     private fun onSubscribe() {

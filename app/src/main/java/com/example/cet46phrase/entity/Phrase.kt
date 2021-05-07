@@ -16,6 +16,17 @@ class Phrase {
     var synonym: String? = null
     lateinit var type: String
     lateinit var unit: String
+
+    var score: Int = 0
+    var last = false
+    var status = 0
+
+    companion object {
+        const val STATUS_UNACTIVE = 0
+        const val STATUS_ACTIVE = 1
+        const val STATUS_NEW = 2
+        const val STATUS_REVIEW = 3
+    }
 }
 
 class Explain {

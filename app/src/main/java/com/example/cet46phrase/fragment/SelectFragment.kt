@@ -67,17 +67,12 @@ class SelectFragment : Fragment() {
                 var itemType = ""
                 var itemUnit = ""
                 viewModel.unitListLiveData.value!!.forEach {
-                    try {
-                        if (mPosition < it.value.size) {
-                            itemUnit = it.value[mPosition]
-                            itemType = it.key
-                        } else {
-                            mPosition -= it.value.size
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+                    if (mPosition < it.value.size) {
+                        itemUnit = it.value[mPosition]
+                        itemType = it.key
+                    } else {
+                        mPosition -= it.value.size
                     }
-
                 }
 
                 holder.type?.text = itemType.replace("_phrase", "")
