@@ -8,6 +8,12 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
+    lintOptions{
+        checkReleaseBuilds false
+        abortOnError false
+
+    }
+
     defaultConfig {
         applicationId "com.example.cet46phrase"
         minSdkVersion 23
