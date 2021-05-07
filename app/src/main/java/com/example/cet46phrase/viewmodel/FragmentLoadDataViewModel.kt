@@ -26,6 +26,7 @@ class FragmentLoadDataViewModel(application: Application) : AndroidViewModel(app
             val isr = InputStreamReader(inputStream)
             isr.readLines().forEachIndexed { index, line ->
                 Log.i("main", "当前进度：$index")
+                Log.i("main","line=$line")
                 val phrase = gson.fromJson(line, Phrase::class.java)
                 phraseDao.insert(phrase)
                 it.onNext(index)

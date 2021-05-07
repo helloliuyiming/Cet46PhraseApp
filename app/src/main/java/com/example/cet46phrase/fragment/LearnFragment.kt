@@ -1,6 +1,7 @@
 package com.example.cet46phrase.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -90,11 +91,11 @@ class LearnFragment : Fragment() {
                 val explain = viewModel.phraseLiveData.value!!.explains[position]
                 val dataBinding = holder.dataBinding
                 if (explain.examples.isNullOrEmpty()) {
-                    dataBinding.tvExample.text = explain.examples[0]
-                } else {
                     dataBinding.tvExample.text = ""
+                } else {
+                    dataBinding.tvExample.text = explain.examples[0]
                 }
-                dataBinding.tvNumber.text = position.toString()
+                dataBinding.tvNumber.text = (position+1).toString()
                 dataBinding.tvExplain.text = explain.explain
             }
 
@@ -120,17 +121,31 @@ class LearnFragment : Fragment() {
         dataBinding.actionSkip.setOnClickListener {
             if (viewModel.phraseLiveData.value == null) return@setOnClickListener
             viewModel.phraseLiveData.value!!.last = true
-            viewModel.skip()
+            viewModel.pass()
         }
         dataBinding.actionUnsure.setOnClickListener {
             if (viewModel.phraseLiveData.value == null) return@setOnClickListener
             viewModel.phraseLiveData.value!!.score = viewModel.phraseLiveData.value!!.score + 1
             viewModel.next()
         }
+
+        dataBinding.btnTestDontKnow.setOnClickListener {
+
+        }
+        dataBinding.btnTestKnow.setOnClickListener {
+
+        }
+        dataBinding.btnWriteDont.setOnClickListener {
+
+        }
+        dataBinding.btnWriteDo.setOnClickListener {
+
+        }
     }
 
     private fun onSubscribe() {
         viewModel.phraseLiveData.observe(viewLifecycleOwner) {
+            Log.i("main"," viewModel.phraseLiveData.observe():phrase=${it.phrase}")
             if (it == null && viewModel.done) {
                 Toast.makeText(context, "已全部学习完，自动退出", Toast.LENGTH_LONG).show()
                 findNavController().popBackStack()
@@ -174,11 +189,13 @@ class LearnFragment : Fragment() {
                     dataBinding.viewShow.visibility = View.GONE
                     dataBinding.viewTest.visibility = View.VISIBLE
                     dataBinding.viewWrite.visibility = View.GONE
+                    dataBinding.tvTestPhrase.text = phrase.phrase
                 }
                 FragmentLearnViewModel.VIEW_TYPE_WRITE -> {
                     dataBinding.viewShow.visibility = View.GONE
                     dataBinding.viewTest.visibility = View.GONE
                     dataBinding.viewWrite.visibility = View.VISIBLE
+                    dataBinding.tvWriteExample.text = "How are you?"
                 }
                 else -> {
                     Toast.makeText(context, "ViewType Value$it wrong", Toast.LENGTH_SHORT).show()
