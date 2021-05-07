@@ -25,6 +25,7 @@ class FragmentMainViewModel(application: Application) : AndroidViewModel(applica
             var count = 0
             followMap.forEach {
                 count += it.value.size
+
             }
             if (count == 0) {
                 followUnitLiveData.value = null

@@ -12,10 +12,14 @@ class TestGson {
     @Test
     fun a() {
         val gson = Gson()
-        val json =
-            "{\"phrase\":\"worthy of\",\"explains\":[{\"explain\":\"值得的；配得上的\",\"examples\":[\"Your diligence is worthy of encouragement, but effort does not equal accomplishment. 你的勤奋值得鼓励，但是你的努力不一定会得到相应的成就。（阅读/CET6，2010.6）\"]}]}"
-        val phrase = gson.fromJson<Phrase>(json, Phrase::class.java)
-        println(phrase)
+        val json = "{\"unit\":\"Unit　1\",\"phrase\":\"abandon oneself to\",\"origin\":\"《四六级常考核心词组》\",\"explains\":[{\"explain\":\"沉溺于，放纵（感情）\",\"examples\":[{\"en\":\"Don't abandon yourself to this kind of pleasure.\",\"cn\":\"别沉溺于这种享乐中。\"}]}],\"type\":\"verb_phrase\"}"
+        try {
+            val phrase = gson.fromJson<Phrase>(json, Phrase::class.java)
+            println(phrase)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
 
     @Test

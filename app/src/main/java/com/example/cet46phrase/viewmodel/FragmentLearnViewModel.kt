@@ -19,6 +19,8 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     val viewTypeLiveData: MutableLiveData<Int> = MutableLiveData()
     val phraseLiveData: MutableLiveData<Phrase> = MutableLiveData()
     val notesLiveData: MutableLiveData<MutableList<Note>> = MutableLiveData()
+    var count = 0
+    var completedLiveData:MutableLiveData<Int> = MutableLiveData(0)
     var done = false
 
     private val context = application
@@ -29,20 +31,26 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     private val gson = Gson()
 
     fun load() {
-        Log.d("main", "load() called")
         val sharedPreferences = context.getSharedPreferences("config", Context.MODE_PRIVATE)
         val followsJson = sharedPreferences.getString("follows", "")
         followMap = gson.fromJson<MutableMap<String, MutableList<String>>>(followsJson,
             object : TypeToken<MutableMap<String, MutableList<String>>>() {}.type)
         Single.create<Boolean> {
-            Log.d("main", " Single.create<Boolean>() called")
+            val list:MutableList<Phrase> = mutableListOf()
             followMap.forEach {
                 val type = it.key
                 it.value.forEach {
-                    phraseDao.queryByUnitAndType(it,type).forEach {
-                        phraseQueue.offer(it)
-                        if (activePhraseQueue.size<10) activePhraseQueue.offer(it)
-                    }
+                    list.addAll(phraseDao.queryByUnitAndType(it,type))
+                }
+            }
+            count = list.size
+            completedLiveData.postValue(completedLiveData.value)
+            list.shuffle()
+            list.forEach {
+                if (activePhraseQueue.size < 11) {
+                    activePhraseQueue.offer(it)
+                }else{
+                    phraseQueue.offer(it)
                 }
             }
             it.onSuccess(true)
@@ -58,7 +66,6 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     }
 
     fun next() {
-        Log.d("main", "next() called")
         if (phraseLiveData.value!=null) activePhraseQueue.offer(phraseLiveData.value)
         if (activePhraseQueue.size == 0 && phraseQueue.size == 0) {
             done = true
@@ -78,14 +85,32 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
 
     fun pass() {
 
-        next()
+        if (activePhraseQueue.size == 0 && phraseQueue.size == 0) {
+            done = true
+            phraseLiveData.value = null
+            return
+        }
+        if (activePhraseQueue.size == 0 && phraseQueue.size > 0) {
+            loadMore()
+            next()
+            return
+        }
+        if (activePhraseQueue.size < 6) {
+            loadMore()
+        }
+        phraseLiveData.value = activePhraseQueue.poll()
+        if (completedLiveData.value == null) {
+            completedLiveData.value = 1
+        }else{
+            completedLiveData.value = completedLiveData.value!!+1
+        }
+
     }
     fun save(){
 
     }
 
     private fun loadMore() {
-        Log.d("main", "loadMore() called")
         for (i in 0..5) {
             val p = phraseQueue.poll()
             if (p != null) {
@@ -94,7 +119,6 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
                 return
             }
         }
-        Log.i("main","activePhraseQueue.size${activePhraseQueue.size}")
     }
 
     companion object {

@@ -1,11 +1,12 @@
 package com.example.cet46phrase.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -18,12 +19,13 @@ import com.example.cet46phrase.databinding.ItemPhraseExplainBinding
 import com.example.cet46phrase.databinding.ItemPhraseNoteBinding
 import com.example.cet46phrase.viewmodel.FragmentLearnViewModel
 
-class LearnFragment : Fragment() {
+class LearnFragment : Fragment(), View.OnClickListener {
 
     lateinit var viewModel: FragmentLearnViewModel
     lateinit var dataBinding: FragmentLearnBinding
     lateinit var noteAdapter: RecyclerView.Adapter<ItemNoteViewHolder>
     lateinit var explainAdapter: RecyclerView.Adapter<ItemExplainViewHolder>
+    lateinit var actionBar: ActionBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +44,7 @@ class LearnFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        initToolbar()
         initListener()
         onSubscribe()
         viewModel.load()
@@ -91,9 +94,11 @@ class LearnFragment : Fragment() {
                 val explain = viewModel.phraseLiveData.value!!.explains[position]
                 val dataBinding = holder.dataBinding
                 if (explain.examples.isNullOrEmpty()) {
-                    dataBinding.tvExample.text = ""
+                    dataBinding.tvExampleEn.text = ""
+                    dataBinding.tvExampleCn.text = ""
                 } else {
-                    dataBinding.tvExample.text = explain.examples[0]
+                    dataBinding.tvExampleEn.text = explain.examples[0].en
+                    dataBinding.tvExampleCn.text = explain.examples[0].cn
                 }
                 dataBinding.tvNumber.text = (position+1).toString()
                 dataBinding.tvExplain.text = explain.explain
@@ -112,40 +117,24 @@ class LearnFragment : Fragment() {
         dataBinding.rvExplain.adapter = explainAdapter
     }
 
+    private fun initToolbar(){
+        val activity = requireActivity() as AppCompatActivity
+        activity.setSupportActionBar(dataBinding.toolbar)
+        actionBar = activity.supportActionBar!!
+    }
+
     private fun initListener() {
-        dataBinding.actionOk.setOnClickListener {
-            if (viewModel.phraseLiveData.value == null) return@setOnClickListener
-            viewModel.phraseLiveData.value!!.score = 3
-            viewModel.next()
-        }
-        dataBinding.actionSkip.setOnClickListener {
-            if (viewModel.phraseLiveData.value == null) return@setOnClickListener
-            viewModel.phraseLiveData.value!!.last = true
-            viewModel.pass()
-        }
-        dataBinding.actionUnsure.setOnClickListener {
-            if (viewModel.phraseLiveData.value == null) return@setOnClickListener
-            viewModel.phraseLiveData.value!!.score = viewModel.phraseLiveData.value!!.score + 1
-            viewModel.next()
-        }
-
-        dataBinding.btnTestDontKnow.setOnClickListener {
-
-        }
-        dataBinding.btnTestKnow.setOnClickListener {
-
-        }
-        dataBinding.btnWriteDont.setOnClickListener {
-
-        }
-        dataBinding.btnWriteDo.setOnClickListener {
-
-        }
+        dataBinding.actionOk.setOnClickListener(this)
+        dataBinding.actionSkip.setOnClickListener (this)
+        dataBinding.actionUnsure.setOnClickListener(this)
+        dataBinding.btnTestDontKnow.setOnClickListener(this)
+        dataBinding.btnTestKnow.setOnClickListener (this)
+        dataBinding.btnWriteDont.setOnClickListener(this)
+        dataBinding.btnWriteDo.setOnClickListener (this)
     }
 
     private fun onSubscribe() {
         viewModel.phraseLiveData.observe(viewLifecycleOwner) {
-            Log.i("main"," viewModel.phraseLiveData.observe():phrase=${it.phrase}")
             if (it == null && viewModel.done) {
                 Toast.makeText(context, "已全部学习完，自动退出", Toast.LENGTH_LONG).show()
                 findNavController().popBackStack()
@@ -172,6 +161,7 @@ class LearnFragment : Fragment() {
                     dataBinding.viewShow.visibility = View.VISIBLE
                     dataBinding.viewTest.visibility = View.GONE
                     dataBinding.viewWrite.visibility = View.GONE
+                    dataBinding.blockAction.visibility = View.VISIBLE
                     dataBinding.tvPhrase.text = phrase.phrase
                     if (phrase.notice == null) {
                         dataBinding.tvNotice.visibility = View.GONE
@@ -189,18 +179,27 @@ class LearnFragment : Fragment() {
                     dataBinding.viewShow.visibility = View.GONE
                     dataBinding.viewTest.visibility = View.VISIBLE
                     dataBinding.viewWrite.visibility = View.GONE
+                    dataBinding.blockAction.visibility = View.GONE
                     dataBinding.tvTestPhrase.text = phrase.phrase
                 }
                 FragmentLearnViewModel.VIEW_TYPE_WRITE -> {
                     dataBinding.viewShow.visibility = View.GONE
                     dataBinding.viewTest.visibility = View.GONE
                     dataBinding.viewWrite.visibility = View.VISIBLE
-                    dataBinding.tvWriteExample.text = "How are you?"
+                    dataBinding.blockAction.visibility = View.GONE
+                    if (phrase.explains.get(0).examples.isNotEmpty()) {
+                        dataBinding.tvWriteExample.text = phrase.explains.get(0).examples[0].cn
+                    }
                 }
                 else -> {
                     Toast.makeText(context, "ViewType Value$it wrong", Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+
+        viewModel.completedLiveData.observe(viewLifecycleOwner){
+            if (it==null) return@observe
+            actionBar.title = "$it / ${viewModel.count}"
         }
     }
 
@@ -209,4 +208,45 @@ class LearnFragment : Fragment() {
 
     inner class ItemNoteViewHolder(val dataBinding: ItemPhraseNoteBinding) :
         RecyclerView.ViewHolder(dataBinding.root)
+
+    override fun onClick(v: View?) {
+        if (viewModel.phraseLiveData.value==null) return
+        if (v==null) return
+        when (v.id) {
+            dataBinding.actionOk.id->{
+                viewModel.phraseLiveData.value!!.score=3
+                viewModel.phraseLiveData.value!!.last = false
+                viewModel.next()
+            }
+            dataBinding.actionUnsure.id->{
+                viewModel.phraseLiveData.value!!.score=viewModel.phraseLiveData.value!!.score+1
+                viewModel.phraseLiveData.value!!.last = false
+                viewModel.next()
+            }
+            dataBinding.actionSkip.id->{
+                viewModel.phraseLiveData.value!!.score=3
+                viewModel.phraseLiveData.value!!.last = true
+                viewModel.next()
+            }
+            dataBinding.btnTestDontKnow.id->{
+                viewModel.phraseLiveData.value!!.score=viewModel.phraseLiveData.value!!.score-2
+                viewModel.phraseLiveData.value!!.last = false
+                viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_SHOW
+            }
+            dataBinding.btnTestKnow.id->{
+                viewModel.phraseLiveData.value!!.score=3
+                viewModel.phraseLiveData.value!!.last = true
+                viewModel.next()
+            }
+            dataBinding.btnWriteDont.id->{
+                viewModel.phraseLiveData.value!!.score=1
+                viewModel.phraseLiveData.value!!.last = false
+                viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_SHOW
+            }
+            dataBinding.btnWriteDo.id->{
+                viewModel.pass()
+            }
+
+        }
+    }
 }

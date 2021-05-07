@@ -42,5 +42,10 @@ class Explain {
     //    @PrimaryKey(autoGenerate = true)
     var id: Int = 0
     lateinit var explain: String
-    var examples: MutableList<String> = mutableListOf()
+    var examples: MutableList<Example> = mutableListOf()
+}
+
+class Example{
+    var cn:String? = null
+    var  en:String? = null
 }
