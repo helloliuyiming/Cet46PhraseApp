@@ -10,6 +10,9 @@ import com.google.gson.reflect.TypeToken
 class FragmentMainViewModel(application: Application) : AndroidViewModel(application) {
     private val context = application
     private val gson = Gson()
+    var verbUnitList:MutableList<String>? = null
+    var prepUnitList:MutableList<String>? = null
+    var otherUnitList:MutableList<String>? = null
     val followUnitLiveData: MutableLiveData<MutableMap<String, MutableList<String>>> =
         MutableLiveData()
 
@@ -19,19 +22,19 @@ class FragmentMainViewModel(application: Application) : AndroidViewModel(applica
         val string = sharedPreferences.getString("follows", "")
         if (string == "") {
             followUnitLiveData.value = null
-        } else {
-            val followMap = gson.fromJson<MutableMap<String, MutableList<String>>>(string,
-                object : TypeToken<MutableMap<String, MutableList<String>>>() {}.type)
-            var count = 0
-            followMap.forEach {
-                count += it.value.size
-
-            }
-            if (count == 0) {
-                followUnitLiveData.value = null
-            } else {
-                followUnitLiveData.value = followMap
+            return
+        }
+        val followMap = gson.fromJson<MutableMap<String, MutableList<String>>>(string,
+            object : TypeToken<MutableMap<String, MutableList<String>>>() {}.type)
+        followMap.forEach {
+            if (it.key == "verb_phrase") {
+                verbUnitList = it.value
+            }else if (it.key == "prep_phrase") {
+                prepUnitList = it.value
+            }else if (it.key == "other_phrase") {
+                otherUnitList = it.value
             }
         }
+
     }
 }

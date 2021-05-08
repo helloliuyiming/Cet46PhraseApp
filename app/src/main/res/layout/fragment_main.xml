@@ -7,6 +7,7 @@
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -16,10 +17,23 @@
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
+                app:layout_constraintTop_toTopOf="parent"
+                app:menu="@menu/app_main"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/primaryColor"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:title="App" >
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/search_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:background="@drawable/bg_searchview"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:imeOptions="actionSearch"
+                    app:defaultQueryHint="搜索"/>
+            </androidx.appcompat.widget.Toolbar>
 
             <Button
                 android:id="@+id/btn_review"
@@ -84,7 +98,6 @@
                             android:id="@+id/rv_board"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:paddingHorizontal="20dp"
                             android:paddingVertical="10dp" />
                     </LinearLayout>
                 </androidx.core.widget.NestedScrollView>
