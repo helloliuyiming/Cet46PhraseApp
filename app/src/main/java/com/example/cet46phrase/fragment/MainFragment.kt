@@ -2,6 +2,7 @@ package com.example.cet46phrase.fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -42,12 +43,13 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        check()
+        checkInit()
         initView()
         initToolbar()
         initListener()
         onSubscribe()
         viewModel.load()
+        checkFollow()
         adapter.notifyDataSetChanged()
     }
 
@@ -194,12 +196,20 @@ class MainFragment : Fragment() {
     private fun onSubscribe() {
     }
 
-    private fun check() {
+    private fun checkInit() {
+        Log.d("main", "check() called")
         val sharedPreferences =
             requireContext().getSharedPreferences("config", Context.MODE_PRIVATE)
         val init = sharedPreferences.getBoolean("init", false)
         if (!init) {
             findNavController().navigate(R.id.action_mainFragment_to_loadDataFragment)
+        }
+    }
+    private fun checkFollow(){
+        if ((viewModel.verbUnitList == null || viewModel.verbUnitList!!.isEmpty()) && (viewModel.prepUnitList == null || viewModel.prepUnitList!!.isEmpty()) && (viewModel.otherUnitList == null || viewModel.otherUnitList!!.isEmpty())) {
+            if (findNavController().currentDestination?.id == R.id.mainFragment) {
+                findNavController().navigate(R.id.action_mainFragment_to_selectFragment)
+            }
         }
     }
 

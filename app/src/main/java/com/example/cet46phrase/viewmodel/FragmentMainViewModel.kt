@@ -18,6 +18,9 @@ class FragmentMainViewModel(application: Application) : AndroidViewModel(applica
 
 
     fun load() {
+        verbUnitList = null
+        prepUnitList = null
+        otherUnitList = null
         val sharedPreferences = context.getSharedPreferences("config", Context.MODE_PRIVATE)
         val string = sharedPreferences.getString("follows", "")
         if (string == "") {

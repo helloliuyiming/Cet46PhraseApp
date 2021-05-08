@@ -80,18 +80,19 @@ class SelectFragment : Fragment() {
             override fun onBindViewHolder(holder: PhraseUnitViewHolder, position: Int) {
                 var mPosition = position
                 var itemType:String? = null
+
                 if (viewModel.verbUnitList != null && viewModel.verbUnitList!!.isNotEmpty()) {
                     if (mPosition < viewModel.verbUnitList!!.size) {
                         itemType = "动词词组"
                     }else{
-                        mPosition-=viewModel.verbUnitList!!.size
+                        mPosition-=(viewModel.verbUnitList!!.size+1)
                     }
                 }
                 if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty()&&itemType==null) {
                     if (mPosition < viewModel.prepUnitList!!.size) {
                         itemType = "介词词组"
                     }else{
-                        mPosition -=viewModel.prepUnitList!!.size
+                        mPosition -=(viewModel.prepUnitList!!.size+1)
                     }
                 }
 
@@ -120,11 +121,16 @@ class SelectFragment : Fragment() {
                 }
                 if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty()&&itemUnit==null) {
                     mPosition--
-                    if (mPosition < viewModel.prepUnitList!!.size) {
-                        itemUnit =   viewModel.prepUnitList!![mPosition]
-                    }else{
-                        mPosition -=viewModel.prepUnitList!!.size
+                    try {
+                        if (mPosition < viewModel.prepUnitList!!.size) {
+                            itemUnit =   viewModel.prepUnitList!![mPosition]
+                        }else{
+                            mPosition -=viewModel.prepUnitList!!.size
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
+
                 }
 
                 if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty()&&itemUnit==null) {
@@ -153,8 +159,13 @@ class SelectFragment : Fragment() {
                     val edit = preferences.edit()
                     val list = mutableListOf<String>()
                     list.add(itemUnit!!)
-                    followsUnit[saveType!!] = list
-                    edit.putString("follows", gson.toJson(followsUnit))
+                    try {
+                        followsUnit[saveType!!] = list
+                        edit.putString("follows", gson.toJson(followsUnit))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+
                     edit.apply()
                     Toast.makeText(context, "切换到$itemType $itemUnit", Toast.LENGTH_SHORT).show()
                     findNavController().popBackStack()
@@ -199,7 +210,6 @@ class SelectFragment : Fragment() {
                     if (mPositon == 0) {
                         return 1
                     }
-                    mPositon = mPositon-viewModel.otherUnitList!!.size-1
                 }
 
                 return 2
