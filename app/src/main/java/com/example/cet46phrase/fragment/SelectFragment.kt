@@ -80,25 +80,40 @@ class SelectFragment : Fragment() {
             override fun onBindViewHolder(holder: PhraseUnitViewHolder, position: Int) {
                 var mPosition = position
                 var itemType:String? = null
+                var itemUnit:String? = null
 
                 if (viewModel.verbUnitList != null && viewModel.verbUnitList!!.isNotEmpty()) {
-                    if (mPosition < viewModel.verbUnitList!!.size) {
+                    if (mPosition <= viewModel.verbUnitList!!.size) {
                         itemType = "动词词组"
+                        if (getItemViewType(position) == 2) {
+                            itemUnit = viewModel.verbUnitList!![mPosition-1]
+                        }
                     }else{
                         mPosition-=(viewModel.verbUnitList!!.size+1)
                     }
                 }
                 if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty()&&itemType==null) {
-                    if (mPosition < viewModel.prepUnitList!!.size) {
+                    if (mPosition <= viewModel.prepUnitList!!.size) {
                         itemType = "介词词组"
+                        if (getItemViewType(position) == 2) {
+                            try {
+                                itemUnit = viewModel.prepUnitList!![mPosition-1]
+                            } catch (e: java.lang.Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+
                     }else{
                         mPosition -=(viewModel.prepUnitList!!.size+1)
                     }
                 }
 
                 if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty()&&itemType==null) {
-                    if (mPosition < viewModel.otherUnitList!!.size) {
+                    if (mPosition <= viewModel.otherUnitList!!.size) {
                         itemType = "其他词组"
+                        if (getItemViewType(position) == 2) {
+                            itemUnit = viewModel.otherUnitList!![mPosition-1]
+                        }
                     }
                 }
 
@@ -110,37 +125,36 @@ class SelectFragment : Fragment() {
                     return
                 }
                 mPosition = position
-                var itemUnit:String? = null
-                if (viewModel.verbUnitList != null && viewModel.verbUnitList!!.isNotEmpty()) {
-                    mPosition--
-                    if (mPosition < viewModel.verbUnitList!!.size) {
-                      itemUnit =   viewModel.verbUnitList!![mPosition]
-                    }else{
-                        mPosition -=viewModel.verbUnitList!!.size
-                    }
-                }
-                if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty()&&itemUnit==null) {
-                    mPosition--
-                    try {
-                        if (mPosition < viewModel.prepUnitList!!.size) {
-                            itemUnit =   viewModel.prepUnitList!![mPosition]
-                        }else{
-                            mPosition -=viewModel.prepUnitList!!.size
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
 
-                }
-
-                if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty()&&itemUnit==null) {
-                    mPosition--
-                    if (mPosition < viewModel.otherUnitList!!.size) {
-                        itemUnit =   viewModel.otherUnitList!![mPosition]
-                    }else{
-                        mPosition -=viewModel.otherUnitList!!.size
-                    }
-                }
+//                if (viewModel.verbUnitList != null && viewModel.verbUnitList!!.isNotEmpty()) {
+//                    mPosition--
+//                    if (mPosition < viewModel.verbUnitList!!.size) {
+//                      itemUnit =   viewModel.verbUnitList!![mPosition]
+//                    }else{
+//                        mPosition -=viewModel.verbUnitList!!.size
+//                    }
+//                }
+//                if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty()&&itemUnit==null) {
+//                    mPosition--
+//                    try {
+//                        if (mPosition < viewModel.prepUnitList!!.size) {
+//                            itemUnit =   viewModel.prepUnitList!![mPosition]
+//                        }else{
+//                            mPosition -=viewModel.prepUnitList!!.size
+//                        }
+//                    } catch (e: Exception) {
+//                        e.printStackTrace()
+//                    }
+//                }
+//
+//                if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty()&&itemUnit==null) {
+//                    mPosition--
+//                    if (mPosition < viewModel.otherUnitList!!.size) {
+//                        itemUnit =   viewModel.otherUnitList!![mPosition]
+//                    }else{
+//                        mPosition -=viewModel.otherUnitList!!.size
+//                    }
+//                }
 
                 holder.unit?.text = itemUnit
                 holder.itemView.setOnClickListener {
@@ -149,7 +163,7 @@ class SelectFragment : Fragment() {
                         saveType = "verb_phrase"
                     }else if ("介词词组" == itemType) {
                         saveType = "prep_phrase"
-                    }else if (""==itemType){
+                    }else if ("其他词组"==itemType){
                         saveType = "other_phrase"
                     }
                     val gson = Gson()

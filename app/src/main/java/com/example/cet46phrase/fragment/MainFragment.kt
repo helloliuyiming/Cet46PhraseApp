@@ -53,6 +53,11 @@ class MainFragment : Fragment() {
         adapter.notifyDataSetChanged()
     }
 
+    override fun onResume() {
+        super.onResume()
+        checkInit()
+        checkFollow()
+    }
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.app_main,menu)
