@@ -29,7 +29,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:paddingHorizontal="20dp">
+                    android:paddingHorizontal="20dp"
+                    tools:visibility="gone">
 
                     <TextView
                         android:id="@+id/tv_phrase"
@@ -104,31 +105,33 @@
                     android:id="@+id/tv_test_phrase"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="140dp"
+                    android:layout_marginBottom="50dp"
                     android:text="TextView"
                     android:textSize="28sp"
                     android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/textView2"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.498"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <TextView
                     android:id="@+id/textView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="80dp"
                     android:text="上面那个短语你认识吗？"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toTopOf="@+id/btn_test_dont_know"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_test_phrase" />
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <Button
                     android:id="@+id/btn_test_dont_know"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="120dp"
+                    android:background="#BDC3C7"
                     android:text="不认识"
+                    android:textColor="@color/white"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/btn_test_know"
                     app:layout_constraintHorizontal_bias="0.5"
@@ -136,9 +139,11 @@
 
                 <Button
                     android:id="@+id/btn_test_know"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:background="#2ECC71"
                     android:text="认识"
+                    android:textColor="@color/white"
                     app:layout_constraintBottom_toBottomOf="@+id/btn_test_dont_know"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
@@ -150,46 +155,51 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"
-                tools:visibility="gone">
+                tools:visibility="visible">
 
                 <TextView
                     android:id="@+id/tv_write_example"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="50dp"
-                    android:layout_marginTop="140dp"
+                    android:layout_marginBottom="50dp"
                     android:text="TextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextView"
                     android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@+id/textView4"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <TextView
                     android:id="@+id/textView4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="80dp"
                     android:text="你能翻译上面的句子吗？"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toTopOf="@+id/btn_write_dont"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_write_example" />
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <Button
                     android:id="@+id/btn_write_dont"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="120dp"
-                    android:text="不能"
+                    android:background="#95A5A6"
+                    android:text="不可以"
+                    android:textColor="@color/white"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/btn_write_do"
                     app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="spread"
                     app:layout_constraintStart_toStartOf="parent" />
 
                 <Button
                     android:id="@+id/btn_write_do"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="可以"
+                    android:background="#2ECC71"
+                    android:textColor="@color/white"
                     app:layout_constraintBottom_toBottomOf="@+id/btn_write_dont"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
@@ -206,6 +216,8 @@
             <Button
                 android:id="@+id/action_ok"
                 android:layout_width="0dp"
+                android:background="#3498DB"
+                android:textColor="@color/white"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="记住了" />
@@ -213,6 +225,8 @@
             <Button
                 android:id="@+id/action_unsure"
                 android:layout_width="0dp"
+                android:background="#27AE60"
+                android:textColor="@color/white"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="不确定" />
@@ -220,6 +234,8 @@
             <Button
                 android:id="@+id/action_skip"
                 android:layout_width="0dp"
+                android:background="#E74C3C"
+                android:textColor="@color/white"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="不再出现" />
