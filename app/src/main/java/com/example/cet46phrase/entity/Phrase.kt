@@ -4,10 +4,11 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.google.gson.annotations.Expose
+import java.io.Serializable
 
 @Entity
 @TypeConverters(TypeConverter::class)
-class Phrase {
+class Phrase : Serializable {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
     lateinit var explains: MutableList<Explain>
@@ -38,14 +39,14 @@ class Phrase {
     }
 }
 
-class Explain {
+class Explain : Serializable {
     //    @PrimaryKey(autoGenerate = true)
     var id: Int = 0
     lateinit var explain: String
     var examples: MutableList<Example> = mutableListOf()
 }
 
-class Example{
+class Example : Serializable{
     var cn:String? = null
     var  en:String? = null
 }

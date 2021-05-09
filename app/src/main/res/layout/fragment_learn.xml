@@ -247,7 +247,6 @@
 
         <LinearLayout
             android:id="@+id/view_bottom_sheet"
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
@@ -257,8 +256,6 @@
             app:behavior_peekHeight="0dp"
             app:layout_behavior="@string/bottom_sheet_behavior">
             <LinearLayout
-                android:focusable="true"
-                android:focusableInTouchMode="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
@@ -278,7 +275,7 @@
             <EditText
                 android:id="@+id/et_note"
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/bg_edit_border"
                 android:gravity="top"
                 android:inputType="textMultiLine"

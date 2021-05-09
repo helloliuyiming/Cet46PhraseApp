@@ -34,6 +34,10 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     private val gson = Gson()
 
     fun load() {
+        if (viewTypeLiveData.value != null && viewTypeLiveData.value == VIEW_TYPE_ONLY_SHOW) {
+            viewTypeLiveData.value = VIEW_TYPE_ONLY_SHOW
+            return
+        }
         val sharedPreferences = context.getSharedPreferences("config", Context.MODE_PRIVATE)
         val followsJson = sharedPreferences.getString("follows", "")
         followMap = gson.fromJson<MutableMap<String, MutableList<String>>>(followsJson,
@@ -187,6 +191,7 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
         const val VIEW_TYPE_SHOW = 1
         const val VIEW_TYPE_TEST = 2
         const val VIEW_TYPE_WRITE = 3
+        const val VIEW_TYPE_ONLY_SHOW = 10
     }
 
 }

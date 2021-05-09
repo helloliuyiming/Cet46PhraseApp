@@ -2,10 +2,16 @@ package com.example.cet46phrase.viewmodel
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import com.example.cet46phrase.entity.Phrase
+import com.example.cet46phrase.util.AppDatabase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 class FragmentMainViewModel(application: Application) : AndroidViewModel(application) {
     private val context = application
@@ -15,7 +21,8 @@ class FragmentMainViewModel(application: Application) : AndroidViewModel(applica
     var otherUnitList:MutableList<String>? = null
     val followUnitLiveData: MutableLiveData<MutableMap<String, MutableList<String>>> =
         MutableLiveData()
-
+    val searchPhrasesLiveData:MutableLiveData<MutableList<Phrase>> = MutableLiveData()
+    val phraseDao = AppDatabase.getInstance(application).phraseDao()
 
     fun load() {
         verbUnitList = null
@@ -39,5 +46,21 @@ class FragmentMainViewModel(application: Application) : AndroidViewModel(applica
             }
         }
 
+    }
+
+    fun searchPhraseByKeyWord(keyWord: String) {
+        if (keyWord.trim().isEmpty()) {
+            searchPhrasesLiveData.value = null
+        }
+        Single.create<MutableList<Phrase>> {
+            it.onSuccess(phraseDao.queryByKeyWord(keyWord))
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                       searchPhrasesLiveData.value = it
+            },{
+                Log.e("main","searchPhraseByKeyWord() ERROR:${it.message}")
+                it.printStackTrace()
+            })
     }
 }

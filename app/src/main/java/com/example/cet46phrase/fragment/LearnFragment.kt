@@ -1,12 +1,12 @@
 package com.example.cet46phrase.fragment
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
+import android.view.*
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
@@ -23,6 +23,7 @@ import com.example.cet46phrase.databinding.FragmentLearnBinding
 import com.example.cet46phrase.databinding.ItemPhraseExplainBinding
 import com.example.cet46phrase.databinding.ItemPhraseNoteBinding
 import com.example.cet46phrase.entity.Note
+import com.example.cet46phrase.entity.Phrase
 import com.example.cet46phrase.util.SpacesItemDecoration
 import com.example.cet46phrase.viewmodel.FragmentLearnViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -37,9 +38,15 @@ class LearnFragment : Fragment(), View.OnClickListener {
     lateinit var actionBar: ActionBar
     lateinit var bottomSheetBehavior:BottomSheetBehavior<View>
 
+    @SuppressLint("UseRequireInsteadOfGet")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(FragmentLearnViewModel::class.java)
+        setHasOptionsMenu(true)
+        if (arguments != null&&arguments!!.get("phrase")!=null) {
+            viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_ONLY_SHOW
+            viewModel.phraseLiveData.value = arguments!!.getSerializable("phrase") as Phrase
+        }
     }
 
     override fun onCreateView(
@@ -58,7 +65,13 @@ class LearnFragment : Fragment(), View.OnClickListener {
         initListener()
         onSubscribe()
         viewModel.load()
+    }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            findNavController().popBackStack()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun initView() {
@@ -138,6 +151,10 @@ class LearnFragment : Fragment(), View.OnClickListener {
         dataBinding.rvNote.adapter = noteAdapter
         dataBinding.rvExplain.adapter = explainAdapter
         dataBinding.rvNote.addItemDecoration(SpacesItemDecoration(SpacesItemDecoration.vertical,10))
+        if (viewModel.viewTypeLiveData.value != null && viewModel.viewTypeLiveData.value == FragmentLearnViewModel.VIEW_TYPE_ONLY_SHOW) {
+            Log.i("main","initView():dataBinding.blockAction.visibility = View.GONE")
+            dataBinding.blockAction.visibility = View.GONE
+        }
 
     }
 
@@ -145,6 +162,12 @@ class LearnFragment : Fragment(), View.OnClickListener {
         val activity = requireActivity() as AppCompatActivity
         activity.setSupportActionBar(dataBinding.toolbar)
         actionBar = activity.supportActionBar!!
+        if (viewModel.viewTypeLiveData.value != null && viewModel.viewTypeLiveData.value == FragmentLearnViewModel.VIEW_TYPE_ONLY_SHOW) {
+            actionBar.setDisplayShowTitleEnabled(true)
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.title = viewModel.phraseLiveData.value?.phrase
+        }
+
     }
 
     private fun initListener() {
@@ -171,7 +194,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
                     if (!dataBinding.floatingActionButton.isShown) {
                         dataBinding.floatingActionButton.show()
                         dataBinding.etNote.clearFocus()
-                        hideKeyboard(requireActivity())
+                        hideKeyboard(requireActivity() as AppCompatActivity)
                     }
                 }else{
                     if (dataBinding.floatingActionButton.isShown) {
@@ -229,6 +252,9 @@ class LearnFragment : Fragment(), View.OnClickListener {
                 Toast.makeText(context, "正在加载中，请稍等...", Toast.LENGTH_LONG).show()
                 return@observe
             }
+            if (viewModel.viewTypeLiveData.value == null || viewModel.viewTypeLiveData.value == FragmentLearnViewModel.VIEW_TYPE_ONLY_SHOW) {
+                return@observe
+            }
             if (it.last) {
                 viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_WRITE
             } else if (it.score < 3) {
@@ -280,6 +306,27 @@ class LearnFragment : Fragment(), View.OnClickListener {
                         dataBinding.tvWriteExample.text = phrase.explains.get(0).examples[0].cn
                     }
                 }
+                FragmentLearnViewModel.VIEW_TYPE_ONLY_SHOW->{
+                    dataBinding.floatingActionButton.show()
+                    dataBinding.viewShow.visibility = View.VISIBLE
+                    dataBinding.viewTest.visibility = View.GONE
+                    dataBinding.viewWrite.visibility = View.GONE
+                    dataBinding.blockAction.visibility = View.GONE
+                    Log.i("main"," viewModel.viewTypeLiveData.observe():dataBinding.blockAction.visibility = View.GONE")
+
+                    dataBinding.tvPhrase.text = phrase.phrase
+                    if (phrase.notice == null) {
+                        dataBinding.tvNotice.visibility = View.GONE
+                    } else {
+                        dataBinding.tvNotice.text = phrase.notice
+                    }
+                    if (phrase.synonym == null) {
+                        dataBinding.tvSynonym.visibility = View.GONE
+                    } else {
+                        dataBinding.tvSynonym.text = phrase.synonym
+                    }
+                    explainAdapter.notifyDataSetChanged()
+                }
                 else -> {
                     Toast.makeText(context, "ViewType Value$it wrong", Toast.LENGTH_SHORT).show()
                 }
@@ -287,7 +334,12 @@ class LearnFragment : Fragment(), View.OnClickListener {
         }
 
         viewModel.completedLiveData.observe(viewLifecycleOwner){
+            Log.i("main", "viewModel.completedLiveData() ")
             if (it==null) return@observe
+            if (viewModel.viewTypeLiveData.value == null || viewModel.viewTypeLiveData.value == FragmentLearnViewModel.VIEW_TYPE_ONLY_SHOW) {
+                initToolbar()
+                return@observe
+            }
             actionBar.title = "$it / ${viewModel.count}"
         }
 
@@ -314,15 +366,18 @@ class LearnFragment : Fragment(), View.OnClickListener {
     }
 
     fun hideKeyboard(activity: Activity) {
-        val imm = activity.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        //Find the currently focused view, so we can grab the correct window token from it.
-        var view = activity.currentFocus
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = View(activity)
+        val inputManager = activity
+            .getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        // check if no view has focus:
+        val currentFocusedView = activity.currentFocus
+        if (currentFocusedView != null) {
+            inputManager.hideSoftInputFromWindow(
+                currentFocusedView.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS
+            )
         }
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
+
     inner class ItemExplainViewHolder(val dataBinding: ItemPhraseExplainBinding) :
         RecyclerView.ViewHolder(dataBinding.root)
 

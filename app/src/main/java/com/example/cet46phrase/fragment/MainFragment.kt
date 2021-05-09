@@ -9,6 +9,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cet46phrase.R
 import com.example.cet46phrase.databinding.FragmentMainBinding
+import com.example.cet46phrase.databinding.ItemPhraseSearchBinding
 import com.example.cet46phrase.viewmodel.FragmentMainViewModel
 
 
@@ -24,7 +26,9 @@ class MainFragment : Fragment() {
 
     lateinit var dataBinding: FragmentMainBinding
     lateinit var viewModel: FragmentMainViewModel
-    lateinit var adapter: RecyclerView.Adapter<PhraseUnitViewHolder>
+    lateinit var unitAdapter: RecyclerView.Adapter<PhraseUnitViewHolder>
+    lateinit var searchAdapter:RecyclerView.Adapter<SearchPhraseViewHolder>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +54,7 @@ class MainFragment : Fragment() {
         onSubscribe()
         viewModel.load()
         checkFollow()
-        adapter.notifyDataSetChanged()
+        unitAdapter.notifyDataSetChanged()
     }
 
     override fun onResume() {
@@ -64,7 +68,7 @@ class MainFragment : Fragment() {
     }
     private fun initView() {
         dataBinding.rvBoard.layoutManager = LinearLayoutManager(context)
-        adapter = object : RecyclerView.Adapter<PhraseUnitViewHolder>() {
+        unitAdapter = object : RecyclerView.Adapter<PhraseUnitViewHolder>() {
             override fun onCreateViewHolder(
                 parent: ViewGroup,
                 viewType: Int
@@ -179,8 +183,36 @@ class MainFragment : Fragment() {
                 return 2
             }
         }
-        dataBinding.rvBoard.adapter = adapter
+        dataBinding.rvBoard.adapter = unitAdapter
 
+        dataBinding.rvSearchPhrase.layoutManager = LinearLayoutManager(context)
+        searchAdapter = object :RecyclerView.Adapter<SearchPhraseViewHolder>(){
+            override fun onCreateViewHolder(
+                parent: ViewGroup,
+                viewType: Int
+            ): SearchPhraseViewHolder {
+                val dataBinding = DataBindingUtil.inflate<ItemPhraseSearchBinding>(layoutInflater,R.layout.item_phrase_search,parent,false)
+                return SearchPhraseViewHolder(dataBinding)
+            }
+
+            override fun onBindViewHolder(holder: SearchPhraseViewHolder, position: Int) {
+                if (viewModel.searchPhrasesLiveData.value==null) return
+                val phrase = viewModel.searchPhrasesLiveData.value!![position]
+                val dataBinding = holder.dataBinding
+                dataBinding.tvPhrase.text = phrase.phrase
+                dataBinding.root.setOnClickListener {
+                    val bundle = Bundle()
+                    bundle.putSerializable("phrase",phrase)
+                    findNavController().navigate(R.id.action_mainFragment_to_learnFragment,bundle)
+                }
+            }
+
+            override fun getItemCount(): Int {
+                return if (viewModel.searchPhrasesLiveData.value==null) 0 else viewModel.searchPhrasesLiveData.value!!.size
+            }
+
+        }
+        dataBinding.rvSearchPhrase.adapter = searchAdapter
     }
 
     private fun initToolbar(){
@@ -196,9 +228,38 @@ class MainFragment : Fragment() {
     private fun initListener() {
         dataBinding.btnEdit.setOnClickListener { findNavController().navigate(R.id.action_mainFragment_to_selectFragment) }
         dataBinding.btnAction.setOnClickListener { findNavController().navigate(R.id.action_mainFragment_to_learnFragment) }
+
+        dataBinding.searchView.setIconifiedByDefault(false)
+        dataBinding.searchView.setOnQueryTextFocusChangeListener { v, hasFocus ->
+            Log.i("main","searchView.hasFocus:$hasFocus")
+            dataBinding.searchView
+            if (hasFocus) {
+                dataBinding.rvSearchPhrase.visibility = View.VISIBLE
+            }else{
+                dataBinding.rvSearchPhrase.visibility = View.GONE
+            }
+        }
+        dataBinding.searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+            override fun onQueryTextChange(newText: String?): Boolean {
+                Log.i("main","searchView.newText:$newText")
+                if (newText != null) {
+                    viewModel.searchPhraseByKeyWord(newText)
+                }else{
+                    viewModel.searchPhrasesLiveData.value = null
+                }
+
+                return true
+            }
+        })
     }
 
     private fun onSubscribe() {
+        viewModel.searchPhrasesLiveData.observe(viewLifecycleOwner){
+            searchAdapter.notifyDataSetChanged()
+        }
     }
 
     private fun checkInit() {
@@ -218,6 +279,8 @@ class MainFragment : Fragment() {
         }
     }
 
+
+    inner class SearchPhraseViewHolder(val dataBinding: ItemPhraseSearchBinding):RecyclerView.ViewHolder(dataBinding.root)
     inner class PhraseUnitViewHolder(itemView: View, viewType: Int) :
         RecyclerView.ViewHolder(itemView) {
         var type: TextView? = null
