@@ -1,12 +1,14 @@
 package com.example.cet46phrase.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +19,10 @@ import com.example.cet46phrase.R
 import com.example.cet46phrase.databinding.FragmentLearnBinding
 import com.example.cet46phrase.databinding.ItemPhraseExplainBinding
 import com.example.cet46phrase.databinding.ItemPhraseNoteBinding
+import com.example.cet46phrase.entity.Note
+import com.example.cet46phrase.util.SpacesItemDecoration
 import com.example.cet46phrase.viewmodel.FragmentLearnViewModel
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 class LearnFragment : Fragment(), View.OnClickListener {
 
@@ -26,6 +31,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
     lateinit var noteAdapter: RecyclerView.Adapter<ItemNoteViewHolder>
     lateinit var explainAdapter: RecyclerView.Adapter<ItemExplainViewHolder>
     lateinit var actionBar: ActionBar
+    lateinit var bottomSheetBehavior:BottomSheetBehavior<View>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,9 +54,12 @@ class LearnFragment : Fragment(), View.OnClickListener {
         initListener()
         onSubscribe()
         viewModel.load()
+
     }
 
     private fun initView() {
+        bottomSheetBehavior = BottomSheetBehavior.from(dataBinding.viewBottomSheet)
+        bottomSheetBehavior.isDraggable = false
         dataBinding.rvExplain.layoutManager = LinearLayoutManager(context)
         dataBinding.rvNote.layoutManager = LinearLayoutManager(context)
         noteAdapter = object : RecyclerView.Adapter<ItemNoteViewHolder>() {
@@ -65,7 +74,16 @@ class LearnFragment : Fragment(), View.OnClickListener {
             }
 
             override fun onBindViewHolder(holder: ItemNoteViewHolder, position: Int) {
-
+                if (viewModel.notesLiveData.value==null) return
+                val note = viewModel.notesLiveData.value!![position]
+                val dataBinding = holder.dataBinding
+                dataBinding.tvNoteContent.text = note.content
+                dataBinding.btnNoteDelete.setOnClickListener {
+                    viewModel.deleteNote(note)
+                }
+                dataBinding.btnNoteEdit.setOnClickListener {
+                    viewModel.editNoteLiveData.value = note
+                }
             }
 
             override fun getItemCount(): Int {
@@ -115,6 +133,8 @@ class LearnFragment : Fragment(), View.OnClickListener {
 
         dataBinding.rvNote.adapter = noteAdapter
         dataBinding.rvExplain.adapter = explainAdapter
+        dataBinding.rvNote.addItemDecoration(SpacesItemDecoration(SpacesItemDecoration.vertical,10))
+
     }
 
     private fun initToolbar(){
@@ -131,6 +151,64 @@ class LearnFragment : Fragment(), View.OnClickListener {
         dataBinding.btnTestKnow.setOnClickListener (this)
         dataBinding.btnWriteDont.setOnClickListener(this)
         dataBinding.btnWriteDo.setOnClickListener (this)
+        dataBinding.floatingActionButton.setOnClickListener {
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }else{
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+            dataBinding.floatingActionButton.hide()
+        }
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    if (!dataBinding.floatingActionButton.isShown) {
+                        dataBinding.floatingActionButton.show()
+                    }
+                }else{
+                    if (dataBinding.floatingActionButton.isShown) {
+                        dataBinding.floatingActionButton.hide()
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) { }
+
+        })
+
+        dataBinding.etNote.addTextChangedListener {
+            var count = 0
+            if (it != null) {
+                count = it.toString().length
+            }
+            dataBinding.tvNoteCount.text = "已输入：$count / 800"
+        }
+
+        dataBinding.btnCommitBtn.setOnClickListener {
+            if (viewModel.editNoteLiveData.value == null && dataBinding.etNote.text == null) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                return@setOnClickListener
+            }
+            if (viewModel.editNoteLiveData.value == null) {
+                val note = Note()
+                note.phrase = viewModel.phraseLiveData.value!!.phrase
+                note.content = dataBinding.etNote.text.toString()
+                viewModel.saveNote(note)
+            }else{
+                viewModel.editNoteLiveData.value!!.content = dataBinding.etNote.text.toString()
+                viewModel.updateNote(viewModel.editNoteLiveData.value!!)
+            }
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+
+        dataBinding.etNote.setOnDragListener { v, event ->
+            Log.d("main", " dataBinding.etNote.setOnDragListener() called")
+            true
+        }
+        dataBinding.btnNoteClose.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
     }
 
     private fun onSubscribe() {
@@ -147,6 +225,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
             if (it.last) {
                 viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_WRITE
             } else if (it.score < 3) {
+                viewModel.loadNote(it.phrase)
                 viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_SHOW
             } else {
                 viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_TEST
@@ -201,6 +280,27 @@ class LearnFragment : Fragment(), View.OnClickListener {
             if (it==null) return@observe
             actionBar.title = "$it / ${viewModel.count}"
         }
+
+        viewModel.editNoteLiveData.observe(viewLifecycleOwner){
+            if (it == null) {
+                dataBinding.etNote.text = null
+                return@observe
+            }
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+            dataBinding.etNote.setText(it.content)
+        }
+
+        viewModel.notesLiveData.observe(viewLifecycleOwner){
+            if (it == null||it.isEmpty()) {
+                dataBinding.blockNote.visibility = View.GONE
+                return@observe
+            }
+            dataBinding.blockNote.visibility = View.VISIBLE
+            noteAdapter.notifyDataSetChanged()
+        }
+
     }
 
     inner class ItemExplainViewHolder(val dataBinding: ItemPhraseExplainBinding) :

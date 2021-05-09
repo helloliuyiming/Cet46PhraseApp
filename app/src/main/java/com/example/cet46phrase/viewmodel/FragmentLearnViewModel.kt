@@ -3,6 +3,7 @@ package com.example.cet46phrase.viewmodel
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.example.cet46phrase.entity.Note
@@ -19,6 +20,7 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     val viewTypeLiveData: MutableLiveData<Int> = MutableLiveData()
     val phraseLiveData: MutableLiveData<Phrase> = MutableLiveData()
     val notesLiveData: MutableLiveData<MutableList<Note>> = MutableLiveData()
+    val editNoteLiveData:MutableLiveData<Note> = MutableLiveData()
     var count = 0
     var completedLiveData:MutableLiveData<Int> = MutableLiveData(0)
     var done = false
@@ -27,6 +29,7 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     private val phraseQueue: Queue<Phrase> = LinkedList<Phrase>()
     private val activePhraseQueue: Queue<Phrase> = LinkedList<Phrase>()
     private val phraseDao = AppDatabase.getInstance(application).phraseDao()
+    private val  noteDao = AppDatabase.getInstance(application).noteDao()
      private lateinit var followMap:MutableMap<String,MutableList<String>>
     private val gson = Gson()
 
@@ -121,6 +124,65 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
+    fun loadNote(phrase: String) {
+        Single.create<MutableList<Note>> {
+            val queryByPhrase = noteDao.queryByPhrase(phrase)
+            it.onSuccess(queryByPhrase)
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                notesLiveData.value = it
+            },{
+                Log.e("main","loadNote() ERROR:${it.message}")
+                it.printStackTrace()
+            })
+    }
+
+    fun saveNote(note: Note){
+        Single.create<Boolean> {
+            noteDao.insert(note)
+            it.onSuccess(true)
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Toast.makeText(context,"笔记保存成功",Toast.LENGTH_SHORT).show()
+                loadNote(note.phrase)
+                editNoteLiveData.value = null
+            },{
+                Log.e("main","saveNote() ERROR:${it.message}")
+                it.printStackTrace()
+            })
+    }
+    fun updateNote(note: Note){
+        Single.create<Boolean> {
+            noteDao.update(note)
+            it.onSuccess(true)
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Toast.makeText(context,"笔记保存成功",Toast.LENGTH_SHORT).show()
+                loadNote(note.phrase)
+                editNoteLiveData.value = null
+            },{
+                Log.e("main","updateNote() ERROR:${it.message}")
+                it.printStackTrace()
+            })
+    }
+    fun deleteNote(note: Note){
+        Single.create<Boolean> {
+            noteDao.delete(note)
+            it.onSuccess(true)
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Toast.makeText(context,"笔记删除成功",Toast.LENGTH_SHORT).show()
+                loadNote(note.phrase)
+                editNoteLiveData.value = null
+            },{
+                Log.e("main","updateNote() ERROR:${it.message}")
+                it.printStackTrace()
+            })
+    }
     companion object {
         const val VIEW_TYPE_SHOW = 1
         const val VIEW_TYPE_TEST = 2

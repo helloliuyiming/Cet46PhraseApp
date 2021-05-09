@@ -14,7 +14,7 @@ import java.io.InputStreamReader
 
 class FragmentLoadDataViewModel(application: Application) : AndroidViewModel(application) {
 
-    var count: Int = 1548
+    var count: Int = 0
     private val context = application
     val phraseDao = AppDatabase.getInstance(context).phraseDao()
     val gson = Gson()
@@ -25,6 +25,7 @@ class FragmentLoadDataViewModel(application: Application) : AndroidViewModel(app
             val inputStream = context.assets.open("phrases.json")
             val isr = InputStreamReader(inputStream)
             isr.readLines().forEachIndexed { index, line ->
+                count++
                 Log.i("main", "当前进度：$index")
                 Log.i("main","line=$line")
                 val phrase = gson.fromJson(line, Phrase::class.java)

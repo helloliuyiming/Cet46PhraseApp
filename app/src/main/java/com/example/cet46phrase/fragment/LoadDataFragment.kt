@@ -53,6 +53,7 @@ class LoadDataFragment : Fragment() {
             edit.apply()
             dataBinding.viewLoad.visibility = View.GONE
             dataBinding.viewDone.visibility = View.VISIBLE
+            dataBinding.tvLoadCount.text = "加载已完成，共加载${viewModel.count}条记录"
         })
     }
 

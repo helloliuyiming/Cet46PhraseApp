@@ -1,9 +1,6 @@
 package com.example.cet46phrase.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.example.cet46phrase.entity.Phrase
 
 @Dao
@@ -23,5 +20,8 @@ interface PhraseDao {
 
     @Insert
     fun insert(phrase: Phrase)
+
+    @Delete
+    fun delete(phrase: Phrase)
 
 }
