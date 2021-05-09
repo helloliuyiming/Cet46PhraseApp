@@ -1,10 +1,13 @@
 package com.example.cet46phrase.fragment
 
+import android.app.Activity
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +26,7 @@ import com.example.cet46phrase.entity.Note
 import com.example.cet46phrase.util.SpacesItemDecoration
 import com.example.cet46phrase.viewmodel.FragmentLearnViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+
 
 class LearnFragment : Fragment(), View.OnClickListener {
 
@@ -157,6 +161,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
             }else{
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
+            viewModel.editNoteLiveData.value = null
             dataBinding.floatingActionButton.hide()
         }
         bottomSheetBehavior.addBottomSheetCallback(object :
@@ -165,6 +170,8 @@ class LearnFragment : Fragment(), View.OnClickListener {
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     if (!dataBinding.floatingActionButton.isShown) {
                         dataBinding.floatingActionButton.show()
+                        dataBinding.etNote.clearFocus()
+                        hideKeyboard(requireActivity())
                     }
                 }else{
                     if (dataBinding.floatingActionButton.isShown) {
@@ -237,6 +244,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
             val phrase = viewModel.phraseLiveData.value!!
             when (it) {
                 FragmentLearnViewModel.VIEW_TYPE_SHOW -> {
+                    dataBinding.floatingActionButton.show()
                     dataBinding.viewShow.visibility = View.VISIBLE
                     dataBinding.viewTest.visibility = View.GONE
                     dataBinding.viewWrite.visibility = View.GONE
@@ -255,6 +263,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
                     explainAdapter.notifyDataSetChanged()
                 }
                 FragmentLearnViewModel.VIEW_TYPE_TEST -> {
+                    dataBinding.floatingActionButton.hide()
                     dataBinding.viewShow.visibility = View.GONE
                     dataBinding.viewTest.visibility = View.VISIBLE
                     dataBinding.viewWrite.visibility = View.GONE
@@ -262,6 +271,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
                     dataBinding.tvTestPhrase.text = phrase.phrase
                 }
                 FragmentLearnViewModel.VIEW_TYPE_WRITE -> {
+                    dataBinding.floatingActionButton.hide()
                     dataBinding.viewShow.visibility = View.GONE
                     dataBinding.viewTest.visibility = View.GONE
                     dataBinding.viewWrite.visibility = View.VISIBLE
@@ -303,6 +313,16 @@ class LearnFragment : Fragment(), View.OnClickListener {
 
     }
 
+    fun hideKeyboard(activity: Activity) {
+        val imm = activity.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        //Find the currently focused view, so we can grab the correct window token from it.
+        var view = activity.currentFocus
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = View(activity)
+        }
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
     inner class ItemExplainViewHolder(val dataBinding: ItemPhraseExplainBinding) :
         RecyclerView.ViewHolder(dataBinding.root)
 
