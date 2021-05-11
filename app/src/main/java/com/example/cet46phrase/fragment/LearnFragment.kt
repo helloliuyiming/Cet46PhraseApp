@@ -44,8 +44,8 @@ class LearnFragment : Fragment(), View.OnClickListener {
         viewModel = ViewModelProvider(this).get(FragmentLearnViewModel::class.java)
         setHasOptionsMenu(true)
         if (arguments != null&&arguments!!.get("phrase")!=null) {
-            viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_ONLY_SHOW
             viewModel.phraseLiveData.value = arguments!!.getSerializable("phrase") as Phrase
+            viewModel.deepLinkSignal = true
         }
     }
 
@@ -151,10 +151,6 @@ class LearnFragment : Fragment(), View.OnClickListener {
         dataBinding.rvNote.adapter = noteAdapter
         dataBinding.rvExplain.adapter = explainAdapter
         dataBinding.rvNote.addItemDecoration(SpacesItemDecoration(SpacesItemDecoration.vertical,10))
-        if (viewModel.viewTypeLiveData.value != null && viewModel.viewTypeLiveData.value == FragmentLearnViewModel.VIEW_TYPE_ONLY_SHOW) {
-            Log.i("main","initView():dataBinding.blockAction.visibility = View.GONE")
-            dataBinding.blockAction.visibility = View.GONE
-        }
 
     }
 
@@ -162,7 +158,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
         val activity = requireActivity() as AppCompatActivity
         activity.setSupportActionBar(dataBinding.toolbar)
         actionBar = activity.supportActionBar!!
-        if (viewModel.viewTypeLiveData.value != null && viewModel.viewTypeLiveData.value == FragmentLearnViewModel.VIEW_TYPE_ONLY_SHOW) {
+        if (viewModel.deepLinkSignal) {
             actionBar.setDisplayShowTitleEnabled(true)
             actionBar.setDisplayHomeAsUpEnabled(true)
             actionBar.title = viewModel.phraseLiveData.value?.phrase
@@ -252,9 +248,6 @@ class LearnFragment : Fragment(), View.OnClickListener {
                 Toast.makeText(context, "正在加载中，请稍等...", Toast.LENGTH_LONG).show()
                 return@observe
             }
-            if (viewModel.viewTypeLiveData.value == null || viewModel.viewTypeLiveData.value == FragmentLearnViewModel.VIEW_TYPE_ONLY_SHOW) {
-                return@observe
-            }
             if (it.last) {
                 viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_WRITE
             } else if (it.score < 3) {
@@ -276,6 +269,9 @@ class LearnFragment : Fragment(), View.OnClickListener {
                     dataBinding.viewWrite.visibility = View.GONE
                     dataBinding.blockAction.visibility = View.VISIBLE
                     dataBinding.tvPhrase.text = phrase.phrase
+                    if (viewModel.deepLinkSignal) {
+                        dataBinding.blockAction.visibility = View.GONE
+                    }
                     if (phrase.notice == null) {
                         dataBinding.tvNotice.visibility = View.GONE
                     } else {
@@ -306,27 +302,6 @@ class LearnFragment : Fragment(), View.OnClickListener {
                         dataBinding.tvWriteExample.text = phrase.explains.get(0).examples[0].cn
                     }
                 }
-                FragmentLearnViewModel.VIEW_TYPE_ONLY_SHOW->{
-                    dataBinding.floatingActionButton.show()
-                    dataBinding.viewShow.visibility = View.VISIBLE
-                    dataBinding.viewTest.visibility = View.GONE
-                    dataBinding.viewWrite.visibility = View.GONE
-                    dataBinding.blockAction.visibility = View.GONE
-                    Log.i("main"," viewModel.viewTypeLiveData.observe():dataBinding.blockAction.visibility = View.GONE")
-
-                    dataBinding.tvPhrase.text = phrase.phrase
-                    if (phrase.notice == null) {
-                        dataBinding.tvNotice.visibility = View.GONE
-                    } else {
-                        dataBinding.tvNotice.text = phrase.notice
-                    }
-                    if (phrase.synonym == null) {
-                        dataBinding.tvSynonym.visibility = View.GONE
-                    } else {
-                        dataBinding.tvSynonym.text = phrase.synonym
-                    }
-                    explainAdapter.notifyDataSetChanged()
-                }
                 else -> {
                     Toast.makeText(context, "ViewType Value$it wrong", Toast.LENGTH_SHORT).show()
                 }
@@ -334,9 +309,8 @@ class LearnFragment : Fragment(), View.OnClickListener {
         }
 
         viewModel.completedLiveData.observe(viewLifecycleOwner){
-            Log.i("main", "viewModel.completedLiveData() ")
             if (it==null) return@observe
-            if (viewModel.viewTypeLiveData.value == null || viewModel.viewTypeLiveData.value == FragmentLearnViewModel.VIEW_TYPE_ONLY_SHOW) {
+            if (viewModel.deepLinkSignal) {
                 initToolbar()
                 return@observe
             }

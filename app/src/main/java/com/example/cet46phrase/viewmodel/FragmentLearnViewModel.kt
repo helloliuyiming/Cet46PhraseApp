@@ -21,6 +21,7 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     val phraseLiveData: MutableLiveData<Phrase> = MutableLiveData()
     val notesLiveData: MutableLiveData<MutableList<Note>> = MutableLiveData()
     val editNoteLiveData:MutableLiveData<Note> = MutableLiveData()
+    var deepLinkSignal:Boolean = false
     var count = 0
     var completedLiveData:MutableLiveData<Int> = MutableLiveData(0)
     var done = false
@@ -34,8 +35,8 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     private val gson = Gson()
 
     fun load() {
-        if (viewTypeLiveData.value != null && viewTypeLiveData.value == VIEW_TYPE_ONLY_SHOW) {
-            viewTypeLiveData.value = VIEW_TYPE_ONLY_SHOW
+        if (deepLinkSignal) {
+
             return
         }
         val sharedPreferences = context.getSharedPreferences("config", Context.MODE_PRIVATE)
@@ -191,7 +192,6 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
         const val VIEW_TYPE_SHOW = 1
         const val VIEW_TYPE_TEST = 2
         const val VIEW_TYPE_WRITE = 3
-        const val VIEW_TYPE_ONLY_SHOW = 10
     }
 
 }
