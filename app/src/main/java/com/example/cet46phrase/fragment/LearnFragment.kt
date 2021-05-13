@@ -43,9 +43,12 @@ class LearnFragment : Fragment(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(FragmentLearnViewModel::class.java)
         setHasOptionsMenu(true)
-        if (arguments != null&&arguments!!.get("phrase")!=null) {
-            viewModel.phraseLiveData.value = arguments!!.getSerializable("phrase") as Phrase
-            viewModel.deepLinkSignal = true
+        if (arguments != null) {
+            viewModel.reviewModeSignal = arguments!!.getBoolean("isReviewMode",false)
+            if (arguments!!.getSerializable("phrase") != null) {
+                viewModel.phraseLiveData.value = arguments!!.getSerializable("phrase") as Phrase
+                viewModel.deepLinkSignal = true
+            }
         }
     }
 

@@ -19,9 +19,11 @@ import java.util.*
 class FragmentLearnViewModel(application: Application) : AndroidViewModel(application) {
     val viewTypeLiveData: MutableLiveData<Int> = MutableLiveData()
     val phraseLiveData: MutableLiveData<Phrase> = MutableLiveData()
+    val phraseListLiveData:MutableLiveData<MutableList<Phrase>> = MutableLiveData()
     val notesLiveData: MutableLiveData<MutableList<Note>> = MutableLiveData()
     val editNoteLiveData:MutableLiveData<Note> = MutableLiveData()
     var deepLinkSignal:Boolean = false
+    var reviewModeSignal:Boolean = false
     var count = 0
     var completedLiveData:MutableLiveData<Int> = MutableLiveData(0)
     var done = false
@@ -36,7 +38,6 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
 
     fun load() {
         if (deepLinkSignal) {
-
             return
         }
         val sharedPreferences = context.getSharedPreferences("config", Context.MODE_PRIVATE)
@@ -54,7 +55,13 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
             count = list.size
             completedLiveData.postValue(completedLiveData.value)
             list.shuffle()
+            Log.i("main","phraseListLiveData.postValue(list)")
+            phraseListLiveData.postValue(list)
             list.forEach {
+                if (reviewModeSignal) {
+                    it.score = 3
+                    it.last = false
+                }
                 if (activePhraseQueue.size < 11) {
                     activePhraseQueue.offer(it)
                 }else{

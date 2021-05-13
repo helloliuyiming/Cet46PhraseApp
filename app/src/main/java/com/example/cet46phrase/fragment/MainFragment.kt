@@ -228,6 +228,14 @@ class MainFragment : Fragment() {
     private fun initListener() {
         dataBinding.btnEdit.setOnClickListener { findNavController().navigate(R.id.action_mainFragment_to_selectFragment) }
         dataBinding.btnAction.setOnClickListener { findNavController().navigate(R.id.action_mainFragment_to_learnFragment) }
+        dataBinding.btnReview.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putBoolean("isReviewMode",true)
+            findNavController().navigate(R.id.action_mainFragment_to_learnFragment,bundle)
+        }
+        dataBinding.btnPhraseList.setOnClickListener {
+            findNavController().navigate(R.id.action_mainFragment_to_phraseListFragment)
+        }
 
         dataBinding.searchView.setIconifiedByDefault(false)
         dataBinding.searchView.setOnQueryTextFocusChangeListener { v, hasFocus ->
