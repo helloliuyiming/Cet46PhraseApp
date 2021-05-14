@@ -84,6 +84,11 @@ class PhraseListFragment : Fragment() {
                 }
                 stringBuild.deleteCharAt(stringBuild.length-1)
                 dataBinding.tvExplains.text = stringBuild
+                dataBinding.root.setOnClickListener {
+                    val bundle = Bundle()
+                    bundle.putSerializable("phrase",phrase)
+                    findNavController().navigate(R.id.action_phraseListFragment_to_learnFragment,bundle)
+                }
             }
 
             override fun getItemCount(): Int {
