@@ -40,6 +40,11 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
         if (deepLinkSignal) {
             return
         }
+        if (phraseListLiveData.value != null) {
+            phraseListLiveData.value = phraseListLiveData.value
+            next()
+            return
+        }
         val sharedPreferences = context.getSharedPreferences("config", Context.MODE_PRIVATE)
         val followsJson = sharedPreferences.getString("follows", "")
         followMap = gson.fromJson<MutableMap<String, MutableList<String>>>(followsJson,
@@ -137,6 +142,7 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     }
 
     fun loadNote(phrase: String) {
+        notesLiveData.value = null
         Single.create<MutableList<Note>> {
             val queryByPhrase = noteDao.queryByPhrase(phrase)
             it.onSuccess(queryByPhrase)

@@ -11,6 +11,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -26,8 +27,9 @@ import com.example.cet46phrase.entity.Note
 import com.example.cet46phrase.entity.Phrase
 import com.example.cet46phrase.util.SpacesItemDecoration
 import com.example.cet46phrase.viewmodel.FragmentLearnViewModel
+import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class LearnFragment : Fragment(), View.OnClickListener {
 
@@ -238,9 +240,18 @@ class LearnFragment : Fragment(), View.OnClickListener {
         dataBinding.btnNoteClose.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
+
+        dataBinding.btnTestPhrase.setOnClickListener {
+            dataBinding.tvTestAnswer.visibility = View.VISIBLE
+        }
+        dataBinding.btnWriteExample.setOnClickListener {
+            dataBinding.tvWriteAnswer.visibility = View.VISIBLE
+            dataBinding.tvWritePhrase.visibility = View.VISIBLE
+        }
     }
 
     private fun onSubscribe() {
+
         viewModel.phraseLiveData.observe(viewLifecycleOwner) {
             if (it == null && viewModel.done) {
                 Toast.makeText(context, "已全部学习完，自动退出", Toast.LENGTH_LONG).show()
@@ -251,10 +262,11 @@ class LearnFragment : Fragment(), View.OnClickListener {
                 Toast.makeText(context, "正在加载中，请稍等...", Toast.LENGTH_LONG).show()
                 return@observe
             }
+
+            viewModel.loadNote(it.phrase)
             if (it.last) {
                 viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_WRITE
             } else if (it.score < 3) {
-                viewModel.loadNote(it.phrase)
                 viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_SHOW
             } else {
                 viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_TEST
@@ -266,12 +278,16 @@ class LearnFragment : Fragment(), View.OnClickListener {
             val phrase = viewModel.phraseLiveData.value!!
             when (it) {
                 FragmentLearnViewModel.VIEW_TYPE_SHOW -> {
-                    dataBinding.floatingActionButton.show()
+
                     dataBinding.viewShow.visibility = View.VISIBLE
                     dataBinding.viewTest.visibility = View.GONE
                     dataBinding.viewWrite.visibility = View.GONE
                     dataBinding.blockAction.visibility = View.VISIBLE
                     dataBinding.tvPhrase.text = phrase.phrase
+                    if (!dataBinding.floatingActionButton.isShown) {
+                        dataBinding.floatingActionButton.show()
+                    }
+                    showFab(fab = dataBinding.floatingActionButton,true)
                     if (viewModel.deepLinkSignal) {
                         dataBinding.blockAction.visibility = View.GONE
                     }
@@ -293,7 +309,15 @@ class LearnFragment : Fragment(), View.OnClickListener {
                     dataBinding.viewTest.visibility = View.VISIBLE
                     dataBinding.viewWrite.visibility = View.GONE
                     dataBinding.blockAction.visibility = View.GONE
-                    dataBinding.tvTestPhrase.text = phrase.phrase
+                    dataBinding.tvTestAnswer.visibility = View.GONE
+                    dataBinding.btnTestPhrase.text = phrase.phrase
+                    val stringBuilder = StringBuilder()
+                    phrase.explains.forEach {
+                        stringBuilder.append(it.explain)
+                        stringBuilder.append("\n")
+                    }
+                    stringBuilder.trim()
+                    dataBinding.tvTestAnswer.text = stringBuilder
                 }
                 FragmentLearnViewModel.VIEW_TYPE_WRITE -> {
                     dataBinding.floatingActionButton.hide()
@@ -301,8 +325,12 @@ class LearnFragment : Fragment(), View.OnClickListener {
                     dataBinding.viewTest.visibility = View.GONE
                     dataBinding.viewWrite.visibility = View.VISIBLE
                     dataBinding.blockAction.visibility = View.GONE
+                    dataBinding.tvWritePhrase.visibility = View.GONE
+                    dataBinding.tvWriteAnswer.visibility = View.GONE
+                    dataBinding.tvWritePhrase.text = phrase.phrase
                     if (phrase.explains.get(0).examples.isNotEmpty()) {
-                        dataBinding.tvWriteExample.text = phrase.explains.get(0).examples[0].cn
+                        dataBinding.btnWriteExample.text = phrase.explains[0].examples[0].cn
+                        dataBinding.tvWriteAnswer.text = phrase.explains[0].examples[0].en
                     }
                 }
                 else -> {
@@ -399,6 +427,20 @@ class LearnFragment : Fragment(), View.OnClickListener {
                 viewModel.pass()
             }
 
+        }
+    }
+
+   private fun showFab(fab: FloatingActionButton, isVisible: Boolean) {
+        val layoutParams: ViewGroup.LayoutParams = fab.layoutParams
+        if (layoutParams is CoordinatorLayout.LayoutParams) {
+            val behavior = layoutParams.behavior
+            if (behavior is HideBottomViewOnScrollBehavior) {
+                if (isVisible) {
+                    behavior.slideUp(fab)
+                } else {
+                    behavior.slideDown(fab)
+                }
+            }
         }
     }
 }
