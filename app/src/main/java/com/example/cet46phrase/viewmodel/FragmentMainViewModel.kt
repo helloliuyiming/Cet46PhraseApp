@@ -23,6 +23,11 @@ class FragmentMainViewModel(application: Application) : AndroidViewModel(applica
         MutableLiveData()
     val searchPhrasesLiveData:MutableLiveData<MutableList<Phrase>> = MutableLiveData()
     val phraseDao = AppDatabase.getInstance(application).phraseDao()
+    val order:Boolean
+    init {
+        val config =application.getSharedPreferences("config",Context.MODE_PRIVATE)
+        order = config.getBoolean("order",false)
+    }
 
     fun load() {
         verbUnitList = null

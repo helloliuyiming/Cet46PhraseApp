@@ -35,6 +35,11 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     private val  noteDao = AppDatabase.getInstance(application).noteDao()
      private lateinit var followMap:MutableMap<String,MutableList<String>>
     private val gson = Gson()
+    private val order:Boolean
+    init {
+        val sharedPreferences = application.getSharedPreferences("config", Context.MODE_PRIVATE)
+        order = sharedPreferences.getBoolean("order",false)
+    }
 
     fun load() {
         if (deepLinkSignal) {
@@ -59,7 +64,9 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
             }
             count = list.size
             completedLiveData.postValue(completedLiveData.value)
-            list.shuffle()
+            if (!order) {
+                list.shuffle()
+            }
             Log.i("main","phraseListLiveData.postValue(list)")
             phraseListLiveData.postValue(list)
             list.forEach {

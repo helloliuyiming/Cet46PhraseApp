@@ -65,7 +65,21 @@ class MainFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.app_main,menu)
+        menu.findItem(R.id.menu_check_box_order).isChecked = viewModel.order
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_check_box_order->{
+                item.isChecked = !item.isChecked
+                val edit = requireContext().getSharedPreferences("config",Context.MODE_PRIVATE).edit()
+                edit.putBoolean("order",item.isChecked)
+                edit.apply()
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun initView() {
         dataBinding.rvBoard.layoutManager = LinearLayoutManager(context)
         unitAdapter = object : RecyclerView.Adapter<PhraseUnitViewHolder>() {
