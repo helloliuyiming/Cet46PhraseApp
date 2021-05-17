@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -130,6 +131,7 @@ class MainFragment : Fragment() {
                 mPosition = position
                 var itemUnit:String? = null
                 holder.itemView.isClickable = false
+                holder.checkBox?.visibility = View.GONE
                 if (viewModel.verbUnitList != null && viewModel.verbUnitList!!.isNotEmpty()) {
                     mPosition--
                     if (mPosition < viewModel.verbUnitList!!.size) {
@@ -313,6 +315,7 @@ class MainFragment : Fragment() {
         var progress: ProgressBar? = null
         var flag: ImageView? = null
         var title:TextView? = null
+        var checkBox:CheckBox? = null
 
         init {
             if (viewType == 2) {
@@ -320,6 +323,7 @@ class MainFragment : Fragment() {
                 unit = itemView.findViewById(R.id.tv_unit)
                 progress = itemView.findViewById(R.id.progressBar_unit)
                 flag = itemView.findViewById(R.id.iv_unit_flag)
+                checkBox = itemView.findViewById(R.id.checkbox)
             }else if (viewType == 1) {
                 title = itemView.findViewById(R.id.tv_title)
             }

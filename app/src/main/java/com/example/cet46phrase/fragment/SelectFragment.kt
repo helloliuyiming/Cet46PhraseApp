@@ -6,10 +6,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -61,6 +58,7 @@ class SelectFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
     private fun initView() {
+        dataBinding.tvFollowInfo.text = "已选择${viewModel.followCount}单元"
         dataBinding.rvUnit.layoutManager = LinearLayoutManager(context)
         adapter = object : RecyclerView.Adapter<PhraseUnitViewHolder>() {
             override fun onCreateViewHolder(
@@ -121,10 +119,24 @@ class SelectFragment : Fragment() {
                     holder.title?.text = itemType
                     return
                 }
-                mPosition = position
-
+                if (viewModel.actionModeLiveData.value == FragmentSelectViewModel.ACTION_MODE_SELECT_SINGLE) {
+                    holder.checkBox?.visibility = View.GONE
+                }else{
+                    holder.checkBox?.visibility = View.VISIBLE
+                }
                 holder.unit?.text = itemUnit
                 holder.itemView.setOnClickListener {
+                    if (viewModel.actionModeLiveData.value == FragmentSelectViewModel.ACTION_MODE_SELECT_MULTIPLE) {
+                        if (holder.checkBox?.isChecked!!) {
+                            holder.checkBox?.isChecked = false
+                            viewModel.followCount--
+                        }else{
+                            holder.checkBox?.isChecked = true
+                            viewModel.followCount++
+                        }
+                        dataBinding.tvFollowInfo.text = "已选择${viewModel.followCount}单元"
+                        return@setOnClickListener
+                    }
                     var saveType:String? = null
                     if ("动词词组" == itemType) {
                         saveType = "verb_phrase"
@@ -152,7 +164,6 @@ class SelectFragment : Fragment() {
                     findNavController().popBackStack()
                 }
                 holder.itemView.setOnLongClickListener {
-                    Toast.makeText(context,"进入多选模式",Toast.LENGTH_SHORT).show()
                     viewModel.actionModeLiveData.value =FragmentSelectViewModel.ACTION_MODE_SELECT_MULTIPLE
                     true
                 }
@@ -192,7 +203,6 @@ class SelectFragment : Fragment() {
                         return 1
                     }
                 }
-
                 return 2
             }
         }
@@ -209,7 +219,8 @@ class SelectFragment : Fragment() {
 
     private fun initListener() {
         dataBinding.btnSubmit.setOnClickListener {
-
+            Toast.makeText(context,"保存失败，系统尚未实现多选",Toast.LENGTH_SHORT).show()
+            findNavController().popBackStack()
         }
     }
 
@@ -237,6 +248,7 @@ class SelectFragment : Fragment() {
         var progress: ProgressBar? = null
         var flag: ImageView? = null
         var title:TextView? = null
+        var checkBox:CheckBox? = null
 
         init {
             if (viewType == 2) {
@@ -244,6 +256,7 @@ class SelectFragment : Fragment() {
                 unit = itemView.findViewById(R.id.tv_unit)
                 progress = itemView.findViewById(R.id.progressBar_unit)
                 flag = itemView.findViewById(R.id.iv_unit_flag)
+                checkBox = itemView.findViewById(R.id.checkbox)
             }else if (viewType == 1) {
                 title = itemView.findViewById(R.id.tv_title)
             }

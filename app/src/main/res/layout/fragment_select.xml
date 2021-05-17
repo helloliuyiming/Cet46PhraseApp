@@ -28,27 +28,27 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1" />
-                <LinearLayout
-                    android:id="@+id/block_select"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="10dp">
-                    <TextView
-                        android:id="@+id/tv_info"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
-                        android:text="当前已选择4个"/>
-                    <Button
-                        android:id="@+id/btn_submit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="提交"/>
-                </LinearLayout>
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
+        <LinearLayout
+            android:id="@+id/block_select"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:paddingHorizontal="10dp">
+            <TextView
+                android:id="@+id/tv_follow_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:text="当前已选择4个"/>
+            <Button
+                android:id="@+id/btn_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="提交"/>
+        </LinearLayout>
     </LinearLayout>
 </layout>
