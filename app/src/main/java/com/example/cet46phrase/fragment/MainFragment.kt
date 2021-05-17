@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -259,6 +260,9 @@ class MainFragment : Fragment() {
                 dataBinding.rvSearchPhrase.visibility = View.VISIBLE
             }else{
                 dataBinding.rvSearchPhrase.visibility = View.GONE
+                //TODO close keyboard
+                val inputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(v.windowToken,0)
             }
         }
         dataBinding.searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener{
@@ -266,8 +270,7 @@ class MainFragment : Fragment() {
                 return true
             }
             override fun onQueryTextChange(newText: String?): Boolean {
-                Log.i("main","searchView.newText:$newText")
-                if (newText != null) {
+                if (newText != null&& newText.isNotEmpty()) {
                     viewModel.searchPhraseByKeyWord(newText)
                 }else{
                     viewModel.searchPhrasesLiveData.value = null

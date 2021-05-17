@@ -2,7 +2,6 @@ package com.example.cet46phrase.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -55,7 +54,6 @@ class SelectFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        Log.d("main", "onOptionsItemSelected() called with: item = $item")
         if (item.itemId == android.R.id.home) {
             findNavController().popBackStack()
             return false
@@ -107,7 +105,6 @@ class SelectFragment : Fragment() {
                         mPosition -=(viewModel.prepUnitList!!.size+1)
                     }
                 }
-
                 if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty()&&itemType==null) {
                     if (mPosition <= viewModel.otherUnitList!!.size) {
                         itemType = "其他词组"
@@ -125,36 +122,6 @@ class SelectFragment : Fragment() {
                     return
                 }
                 mPosition = position
-
-//                if (viewModel.verbUnitList != null && viewModel.verbUnitList!!.isNotEmpty()) {
-//                    mPosition--
-//                    if (mPosition < viewModel.verbUnitList!!.size) {
-//                      itemUnit =   viewModel.verbUnitList!![mPosition]
-//                    }else{
-//                        mPosition -=viewModel.verbUnitList!!.size
-//                    }
-//                }
-//                if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty()&&itemUnit==null) {
-//                    mPosition--
-//                    try {
-//                        if (mPosition < viewModel.prepUnitList!!.size) {
-//                            itemUnit =   viewModel.prepUnitList!![mPosition]
-//                        }else{
-//                            mPosition -=viewModel.prepUnitList!!.size
-//                        }
-//                    } catch (e: Exception) {
-//                        e.printStackTrace()
-//                    }
-//                }
-//
-//                if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty()&&itemUnit==null) {
-//                    mPosition--
-//                    if (mPosition < viewModel.otherUnitList!!.size) {
-//                        itemUnit =   viewModel.otherUnitList!![mPosition]
-//                    }else{
-//                        mPosition -=viewModel.otherUnitList!!.size
-//                    }
-//                }
 
                 holder.unit?.text = itemUnit
                 holder.itemView.setOnClickListener {
