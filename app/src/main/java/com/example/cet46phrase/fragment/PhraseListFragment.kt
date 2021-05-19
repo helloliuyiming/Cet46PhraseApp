@@ -24,6 +24,8 @@ class PhraseListFragment : Fragment() {
     lateinit var viewModel: FragmentLearnViewModel
     lateinit var dataBinding: FragmentPhraseListBinding
     lateinit var adapter:RecyclerView.Adapter<ItemPhraseListViewHolder>
+    private var lastOffset = 0
+    private var lastPosition = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +47,8 @@ class PhraseListFragment : Fragment() {
             findNavController().popBackStack()
         }
         return super.onOptionsItemSelected(item)
-
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -57,6 +59,26 @@ class PhraseListFragment : Fragment() {
         viewModel.load()
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (dataBinding.rvPhrase.layoutManager != null && lastPosition >= 0) {
+            val linearLayoutManager = dataBinding.rvPhrase.layoutManager as LinearLayoutManager
+            linearLayoutManager.scrollToPositionWithOffset(lastPosition,lastOffset)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (dataBinding.rvPhrase.layoutManager != null) {
+            val linearLayoutManager = dataBinding.rvPhrase.layoutManager as LinearLayoutManager
+            val topView = linearLayoutManager.getChildAt(0)
+            if (topView != null) {
+                lastOffset = topView.top
+                lastPosition = linearLayoutManager.getPosition(topView)
+            }
+        }
+        Log.i("main","onStop():lastPosition:${lastPosition}; lastOffset:${lastOffset}")
+    }
     private fun initView(){
         dataBinding.rvPhrase.layoutManager = LinearLayoutManager(context)
         adapter = object : RecyclerView.Adapter<ItemPhraseListViewHolder>() {
@@ -113,6 +135,7 @@ class PhraseListFragment : Fragment() {
     }
 
     private fun onSubscribe() {
+        Log.d("main", "onSubscribe() called:${this}")
         viewModel.phraseListLiveData.observe(viewLifecycleOwner){
             if (it==null) return@observe
             Log.i("main","adapter.notifyDataSetChanged()")

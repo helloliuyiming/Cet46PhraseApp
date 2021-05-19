@@ -46,7 +46,7 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
             return
         }
         if (phraseListLiveData.value != null) {
-            phraseListLiveData.value = phraseListLiveData.value
+//            phraseListLiveData.value = phraseListLiveData.value
             next()
             return
         }
