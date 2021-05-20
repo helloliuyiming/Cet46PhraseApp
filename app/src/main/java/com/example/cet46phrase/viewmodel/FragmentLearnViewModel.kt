@@ -19,26 +19,27 @@ import java.util.*
 class FragmentLearnViewModel(application: Application) : AndroidViewModel(application) {
     val viewTypeLiveData: MutableLiveData<Int> = MutableLiveData()
     val phraseLiveData: MutableLiveData<Phrase> = MutableLiveData()
-    val phraseListLiveData:MutableLiveData<MutableList<Phrase>> = MutableLiveData()
+    val phraseListLiveData: MutableLiveData<MutableList<Phrase>> = MutableLiveData()
     val notesLiveData: MutableLiveData<MutableList<Note>> = MutableLiveData()
-    val editNoteLiveData:MutableLiveData<Note> = MutableLiveData()
-    var deepLinkSignal:Boolean = false
-    var reviewModeSignal:Boolean = false
+    val editNoteLiveData: MutableLiveData<Note> = MutableLiveData()
+    var deepLinkSignal: Boolean = false
+    var reviewModeSignal: Boolean = false
     var count = 0
-    var completedLiveData:MutableLiveData<Int> = MutableLiveData(0)
+    var completedLiveData: MutableLiveData<Int> = MutableLiveData(0)
     var done = false
 
     private val context = application
     private val phraseQueue: Queue<Phrase> = LinkedList<Phrase>()
     private val activePhraseQueue: Queue<Phrase> = LinkedList<Phrase>()
     private val phraseDao = AppDatabase.getInstance(application).phraseDao()
-    private val  noteDao = AppDatabase.getInstance(application).noteDao()
-     private lateinit var followMap:MutableMap<String,MutableList<String>>
+    private val noteDao = AppDatabase.getInstance(application).noteDao()
+    private lateinit var followMap: MutableMap<String, MutableList<String>>
     private val gson = Gson()
-    private val order:Boolean
+    private val order: Boolean
+
     init {
         val sharedPreferences = application.getSharedPreferences("config", Context.MODE_PRIVATE)
-        order = sharedPreferences.getBoolean("order",false)
+        order = sharedPreferences.getBoolean("order", false)
     }
 
     fun load() {
@@ -53,13 +54,14 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
         val sharedPreferences = context.getSharedPreferences("config", Context.MODE_PRIVATE)
         val followsJson = sharedPreferences.getString("follows", "")
         followMap = gson.fromJson<MutableMap<String, MutableList<String>>>(followsJson,
-            object : TypeToken<MutableMap<String, MutableList<String>>>() {}.type)
+            object : TypeToken<MutableMap<String, MutableList<String>>>() {}.type
+        )
         Single.create<Boolean> {
-            val list:MutableList<Phrase> = mutableListOf()
+            val list: MutableList<Phrase> = mutableListOf()
             followMap.forEach {
                 val type = it.key
                 it.value.forEach {
-                    list.addAll(phraseDao.queryByUnitAndType(it,type))
+                    list.addAll(phraseDao.queryByUnitAndType(it, type))
                 }
             }
             count = list.size
@@ -67,7 +69,7 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
             if (!order) {
                 list.shuffle()
             }
-            Log.i("main","phraseListLiveData.postValue(list)")
+            Log.i("main", "phraseListLiveData.postValue(list)")
             phraseListLiveData.postValue(list)
             list.forEach {
                 if (reviewModeSignal) {
@@ -76,7 +78,7 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
                 }
                 if (activePhraseQueue.size < 11) {
                     activePhraseQueue.offer(it)
-                }else{
+                } else {
                     phraseQueue.offer(it)
                 }
             }
@@ -84,16 +86,16 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                       next()
-            },{
-                Log.e("main","${it.message}")
+                next()
+            }, {
+                Log.e("main", "${it.message}")
                 it.printStackTrace()
             })
 
     }
 
     fun next() {
-        if (phraseLiveData.value!=null) activePhraseQueue.offer(phraseLiveData.value)
+        if (phraseLiveData.value != null) activePhraseQueue.offer(phraseLiveData.value)
         if (activePhraseQueue.size == 0 && phraseQueue.size == 0) {
             done = true
             phraseLiveData.value = null
@@ -128,12 +130,13 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
         phraseLiveData.value = activePhraseQueue.poll()
         if (completedLiveData.value == null) {
             completedLiveData.value = 1
-        }else{
-            completedLiveData.value = completedLiveData.value!!+1
+        } else {
+            completedLiveData.value = completedLiveData.value!! + 1
         }
 
     }
-    fun save(){
+
+    fun save() {
 
     }
 
@@ -142,7 +145,7 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
             val p = phraseQueue.poll()
             if (p != null) {
                 activePhraseQueue.offer(p)
-            }else{
+            } else {
                 return
             }
         }
@@ -157,57 +160,60 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 notesLiveData.value = it
-            },{
-                Log.e("main","loadNote() ERROR:${it.message}")
+            }, {
+                Log.e("main", "loadNote() ERROR:${it.message}")
                 it.printStackTrace()
             })
     }
 
-    fun saveNote(note: Note){
+    fun saveNote(note: Note) {
         Single.create<Boolean> {
             noteDao.insert(note)
             it.onSuccess(true)
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                Toast.makeText(context,"笔记保存成功",Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "笔记保存成功", Toast.LENGTH_SHORT).show()
                 loadNote(note.phrase)
                 editNoteLiveData.value = null
-            },{
-                Log.e("main","saveNote() ERROR:${it.message}")
+            }, {
+                Log.e("main", "saveNote() ERROR:${it.message}")
                 it.printStackTrace()
             })
     }
-    fun updateNote(note: Note){
+
+    fun updateNote(note: Note) {
         Single.create<Boolean> {
             noteDao.update(note)
             it.onSuccess(true)
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                Toast.makeText(context,"笔记保存成功",Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "笔记保存成功", Toast.LENGTH_SHORT).show()
                 loadNote(note.phrase)
                 editNoteLiveData.value = null
-            },{
-                Log.e("main","updateNote() ERROR:${it.message}")
+            }, {
+                Log.e("main", "updateNote() ERROR:${it.message}")
                 it.printStackTrace()
             })
     }
-    fun deleteNote(note: Note){
+
+    fun deleteNote(note: Note) {
         Single.create<Boolean> {
             noteDao.delete(note)
             it.onSuccess(true)
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                Toast.makeText(context,"笔记删除成功",Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "笔记删除成功", Toast.LENGTH_SHORT).show()
                 loadNote(note.phrase)
                 editNoteLiveData.value = null
-            },{
-                Log.e("main","updateNote() ERROR:${it.message}")
+            }, {
+                Log.e("main", "updateNote() ERROR:${it.message}")
                 it.printStackTrace()
             })
     }
+
     companion object {
         const val VIEW_TYPE_SHOW = 1
         const val VIEW_TYPE_TEST = 2

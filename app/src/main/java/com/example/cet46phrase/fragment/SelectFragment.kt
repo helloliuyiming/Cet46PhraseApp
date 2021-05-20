@@ -57,6 +57,7 @@ class SelectFragment : Fragment() {
         }
         return super.onOptionsItemSelected(item)
     }
+
     private fun initView() {
         dataBinding.tvFollowInfo.text = "已选择${viewModel.followCount}单元"
         dataBinding.rvUnit.layoutManager = LinearLayoutManager(context)
@@ -66,8 +67,9 @@ class SelectFragment : Fragment() {
                 viewType: Int
             ): PhraseUnitViewHolder {
                 if (viewType == 1) {
-                    val inflate = layoutInflater.inflate(R.layout.item_phrase_category_title, parent, false)
-                    return PhraseUnitViewHolder(inflate,1)
+                    val inflate =
+                        layoutInflater.inflate(R.layout.item_phrase_category_title, parent, false)
+                    return PhraseUnitViewHolder(inflate, 1)
                 }
                 val inflate = layoutInflater.inflate(R.layout.item_phrase_unit, parent, false)
                 return PhraseUnitViewHolder(inflate, 2)
@@ -75,39 +77,39 @@ class SelectFragment : Fragment() {
 
             override fun onBindViewHolder(holder: PhraseUnitViewHolder, position: Int) {
                 var mPosition = position
-                var itemType:String? = null
-                var itemUnit:String? = null
+                var itemType: String? = null
+                var itemUnit: String? = null
 
                 if (viewModel.verbUnitList != null && viewModel.verbUnitList!!.isNotEmpty()) {
                     if (mPosition <= viewModel.verbUnitList!!.size) {
                         itemType = "动词词组"
                         if (getItemViewType(position) == 2) {
-                            itemUnit = viewModel.verbUnitList!![mPosition-1]
+                            itemUnit = viewModel.verbUnitList!![mPosition - 1]
                         }
-                    }else{
-                        mPosition-=(viewModel.verbUnitList!!.size+1)
+                    } else {
+                        mPosition -= (viewModel.verbUnitList!!.size + 1)
                     }
                 }
-                if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty()&&itemType==null) {
+                if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty() && itemType == null) {
                     if (mPosition <= viewModel.prepUnitList!!.size) {
                         itemType = "介词词组"
                         if (getItemViewType(position) == 2) {
                             try {
-                                itemUnit = viewModel.prepUnitList!![mPosition-1]
+                                itemUnit = viewModel.prepUnitList!![mPosition - 1]
                             } catch (e: java.lang.Exception) {
                                 e.printStackTrace()
                             }
                         }
 
-                    }else{
-                        mPosition -=(viewModel.prepUnitList!!.size+1)
+                    } else {
+                        mPosition -= (viewModel.prepUnitList!!.size + 1)
                     }
                 }
-                if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty()&&itemType==null) {
+                if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty() && itemType == null) {
                     if (mPosition <= viewModel.otherUnitList!!.size) {
                         itemType = "其他词组"
                         if (getItemViewType(position) == 2) {
-                            itemUnit = viewModel.otherUnitList!![mPosition-1]
+                            itemUnit = viewModel.otherUnitList!![mPosition - 1]
                         }
                     }
                 }
@@ -121,7 +123,7 @@ class SelectFragment : Fragment() {
                 }
                 if (viewModel.actionModeLiveData.value == FragmentSelectViewModel.ACTION_MODE_SELECT_SINGLE) {
                     holder.checkBox?.visibility = View.GONE
-                }else{
+                } else {
                     holder.checkBox?.visibility = View.VISIBLE
                 }
                 holder.unit?.text = itemUnit
@@ -130,19 +132,19 @@ class SelectFragment : Fragment() {
                         if (holder.checkBox?.isChecked!!) {
                             holder.checkBox?.isChecked = false
                             viewModel.followCount--
-                        }else{
+                        } else {
                             holder.checkBox?.isChecked = true
                             viewModel.followCount++
                         }
                         dataBinding.tvFollowInfo.text = "已选择${viewModel.followCount}单元"
                         return@setOnClickListener
                     }
-                    var saveType:String? = null
+                    var saveType: String? = null
                     if ("动词词组" == itemType) {
                         saveType = "verb_phrase"
-                    }else if ("介词词组" == itemType) {
+                    } else if ("介词词组" == itemType) {
                         saveType = "prep_phrase"
-                    }else if ("其他词组"==itemType){
+                    } else if ("其他词组" == itemType) {
                         saveType = "other_phrase"
                     }
                     val gson = Gson()
@@ -164,7 +166,8 @@ class SelectFragment : Fragment() {
                     findNavController().popBackStack()
                 }
                 holder.itemView.setOnLongClickListener {
-                    viewModel.actionModeLiveData.value =FragmentSelectViewModel.ACTION_MODE_SELECT_MULTIPLE
+                    viewModel.actionModeLiveData.value =
+                        FragmentSelectViewModel.ACTION_MODE_SELECT_MULTIPLE
                     true
                 }
             }
@@ -172,13 +175,13 @@ class SelectFragment : Fragment() {
             override fun getItemCount(): Int {
                 var count = 0
                 if (viewModel.verbUnitList != null && viewModel.verbUnitList!!.isNotEmpty()) {
-                    count+=viewModel.verbUnitList!!.size+1
+                    count += viewModel.verbUnitList!!.size + 1
                 }
                 if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty()) {
-                    count+=viewModel.prepUnitList!!.size+1
+                    count += viewModel.prepUnitList!!.size + 1
                 }
                 if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty()) {
-                    count+=viewModel.otherUnitList!!.size+1
+                    count += viewModel.otherUnitList!!.size + 1
                 }
                 return count
             }
@@ -189,13 +192,13 @@ class SelectFragment : Fragment() {
                     if (mPositon == 0) {
                         return 1
                     }
-                    mPositon = mPositon-viewModel.verbUnitList!!.size-1
+                    mPositon = mPositon - viewModel.verbUnitList!!.size - 1
                 }
                 if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty()) {
                     if (mPositon == 0) {
                         return 1
                     }
-                    mPositon = mPositon-viewModel.prepUnitList!!.size-1
+                    mPositon = mPositon - viewModel.prepUnitList!!.size - 1
                 }
 
                 if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty()) {
@@ -209,7 +212,7 @@ class SelectFragment : Fragment() {
         dataBinding.rvUnit.adapter = adapter
     }
 
-    private fun initToolbar(){
+    private fun initToolbar() {
         val activity = requireActivity() as AppCompatActivity
         activity.setSupportActionBar(dataBinding.toolbar)
         val actionBar = activity.supportActionBar
@@ -219,21 +222,21 @@ class SelectFragment : Fragment() {
 
     private fun initListener() {
         dataBinding.btnSubmit.setOnClickListener {
-            Toast.makeText(context,"保存失败，系统尚未实现多选",Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "保存失败，系统尚未实现多选", Toast.LENGTH_SHORT).show()
             findNavController().popBackStack()
         }
     }
 
     private fun onSubscribe() {
-        viewModel.actionModeLiveData.observe(viewLifecycleOwner){
-            if (it==null) return@observe
+        viewModel.actionModeLiveData.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
             when (it) {
-                FragmentSelectViewModel.ACTION_MODE_SELECT_SINGLE->{
-                    dataBinding.blockSelect.visibility =View.GONE
+                FragmentSelectViewModel.ACTION_MODE_SELECT_SINGLE -> {
+                    dataBinding.blockSelect.visibility = View.GONE
                     adapter.notifyDataSetChanged()
                 }
-                FragmentSelectViewModel.ACTION_MODE_SELECT_MULTIPLE->{
-                    dataBinding.blockSelect.visibility =View.VISIBLE
+                FragmentSelectViewModel.ACTION_MODE_SELECT_MULTIPLE -> {
+                    dataBinding.blockSelect.visibility = View.VISIBLE
                     adapter.notifyDataSetChanged()
                 }
             }
@@ -247,8 +250,8 @@ class SelectFragment : Fragment() {
         var unit: TextView? = null
         var progress: ProgressBar? = null
         var flag: ImageView? = null
-        var title:TextView? = null
-        var checkBox:CheckBox? = null
+        var title: TextView? = null
+        var checkBox: CheckBox? = null
 
         init {
             if (viewType == 2) {
@@ -257,7 +260,7 @@ class SelectFragment : Fragment() {
                 progress = itemView.findViewById(R.id.progressBar_unit)
                 flag = itemView.findViewById(R.id.iv_unit_flag)
                 checkBox = itemView.findViewById(R.id.checkbox)
-            }else if (viewType == 1) {
+            } else if (viewType == 1) {
                 title = itemView.findViewById(R.id.tv_title)
             }
         }

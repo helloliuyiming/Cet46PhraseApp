@@ -22,6 +22,7 @@ class Phrase : Serializable {
 
     @Expose
     var score: Int = 0
+
     @Expose
     var last = false
     var status = 0
@@ -46,7 +47,7 @@ class Explain : Serializable {
     var examples: MutableList<Example> = mutableListOf()
 }
 
-class Example : Serializable{
-    var cn:String? = null
-    var  en:String? = null
+class Example : Serializable {
+    var cn: String? = null
+    var en: String? = null
 }

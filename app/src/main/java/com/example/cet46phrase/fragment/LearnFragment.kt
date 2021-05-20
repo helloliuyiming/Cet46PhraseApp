@@ -38,7 +38,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
     lateinit var noteAdapter: RecyclerView.Adapter<ItemNoteViewHolder>
     lateinit var explainAdapter: RecyclerView.Adapter<ItemExplainViewHolder>
     lateinit var actionBar: ActionBar
-    lateinit var bottomSheetBehavior:BottomSheetBehavior<View>
+    lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
 
     @SuppressLint("UseRequireInsteadOfGet")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +46,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
         viewModel = ViewModelProvider(this).get(FragmentLearnViewModel::class.java)
         setHasOptionsMenu(true)
         if (arguments != null) {
-            viewModel.reviewModeSignal = arguments!!.getBoolean("isReviewMode",false)
+            viewModel.reviewModeSignal = arguments!!.getBoolean("isReviewMode", false)
             if (arguments!!.getSerializable("phrase") != null) {
                 viewModel.phraseLiveData.value = arguments!!.getSerializable("phrase") as Phrase
                 viewModel.deepLinkSignal = true
@@ -96,7 +96,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
             }
 
             override fun onBindViewHolder(holder: ItemNoteViewHolder, position: Int) {
-                if (viewModel.notesLiveData.value==null) return
+                if (viewModel.notesLiveData.value == null) return
                 val note = viewModel.notesLiveData.value!![position]
                 val dataBinding = holder.dataBinding
                 dataBinding.tvNoteContent.text = note.content
@@ -140,7 +140,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
                     dataBinding.tvExampleEn.text = explain.examples[0].en
                     dataBinding.tvExampleCn.text = explain.examples[0].cn
                 }
-                dataBinding.tvNumber.text = (position+1).toString()
+                dataBinding.tvNumber.text = (position + 1).toString()
                 dataBinding.tvExplain.text = explain.explain
             }
 
@@ -155,11 +155,16 @@ class LearnFragment : Fragment(), View.OnClickListener {
 
         dataBinding.rvNote.adapter = noteAdapter
         dataBinding.rvExplain.adapter = explainAdapter
-        dataBinding.rvNote.addItemDecoration(SpacesItemDecoration(SpacesItemDecoration.vertical,10))
+        dataBinding.rvNote.addItemDecoration(
+            SpacesItemDecoration(
+                SpacesItemDecoration.vertical,
+                10
+            )
+        )
 
     }
 
-    private fun initToolbar(){
+    private fun initToolbar() {
         val activity = requireActivity() as AppCompatActivity
         activity.setSupportActionBar(dataBinding.toolbar)
         actionBar = activity.supportActionBar!!
@@ -173,16 +178,16 @@ class LearnFragment : Fragment(), View.OnClickListener {
 
     private fun initListener() {
         dataBinding.actionOk.setOnClickListener(this)
-        dataBinding.actionSkip.setOnClickListener (this)
+        dataBinding.actionSkip.setOnClickListener(this)
         dataBinding.actionUnsure.setOnClickListener(this)
         dataBinding.btnTestDontKnow.setOnClickListener(this)
-        dataBinding.btnTestKnow.setOnClickListener (this)
+        dataBinding.btnTestKnow.setOnClickListener(this)
         dataBinding.btnWriteDont.setOnClickListener(this)
-        dataBinding.btnWriteDo.setOnClickListener (this)
+        dataBinding.btnWriteDo.setOnClickListener(this)
         dataBinding.floatingActionButton.setOnClickListener {
             if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            }else{
+            } else {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
             viewModel.editNoteLiveData.value = null
@@ -197,14 +202,14 @@ class LearnFragment : Fragment(), View.OnClickListener {
                         dataBinding.etNote.clearFocus()
                         hideKeyboard(requireActivity() as AppCompatActivity)
                     }
-                }else{
+                } else {
                     if (dataBinding.floatingActionButton.isShown) {
                         dataBinding.floatingActionButton.hide()
                     }
                 }
             }
 
-            override fun onSlide(bottomSheet: View, slideOffset: Float) { }
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
 
         })
 
@@ -226,7 +231,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
                 note.phrase = viewModel.phraseLiveData.value!!.phrase
                 note.content = dataBinding.etNote.text.toString()
                 viewModel.saveNote(note)
-            }else{
+            } else {
                 viewModel.editNoteLiveData.value!!.content = dataBinding.etNote.text.toString()
                 viewModel.updateNote(viewModel.editNoteLiveData.value!!)
             }
@@ -287,7 +292,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
                     if (!dataBinding.floatingActionButton.isShown) {
                         dataBinding.floatingActionButton.show()
                     }
-                    showFab(fab = dataBinding.floatingActionButton,true)
+                    showFab(fab = dataBinding.floatingActionButton, true)
                     if (viewModel.deepLinkSignal) {
                         dataBinding.blockAction.visibility = View.GONE
                     }
@@ -339,8 +344,8 @@ class LearnFragment : Fragment(), View.OnClickListener {
             }
         }
 
-        viewModel.completedLiveData.observe(viewLifecycleOwner){
-            if (it==null) return@observe
+        viewModel.completedLiveData.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
             if (viewModel.deepLinkSignal) {
                 initToolbar()
                 return@observe
@@ -348,7 +353,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
             actionBar.title = "$it / ${viewModel.count}"
         }
 
-        viewModel.editNoteLiveData.observe(viewLifecycleOwner){
+        viewModel.editNoteLiveData.observe(viewLifecycleOwner) {
             if (it == null) {
                 dataBinding.etNote.text = null
                 return@observe
@@ -359,8 +364,8 @@ class LearnFragment : Fragment(), View.OnClickListener {
             dataBinding.etNote.setText(it.content)
         }
 
-        viewModel.notesLiveData.observe(viewLifecycleOwner){
-            if (it == null||it.isEmpty()) {
+        viewModel.notesLiveData.observe(viewLifecycleOwner) {
+            if (it == null || it.isEmpty()) {
                 dataBinding.blockNote.visibility = View.GONE
                 return@observe
             }
@@ -390,47 +395,47 @@ class LearnFragment : Fragment(), View.OnClickListener {
         RecyclerView.ViewHolder(dataBinding.root)
 
     override fun onClick(v: View?) {
-        if (viewModel.phraseLiveData.value==null) return
-        if (v==null) return
+        if (viewModel.phraseLiveData.value == null) return
+        if (v == null) return
         when (v.id) {
-            dataBinding.actionOk.id->{
-                viewModel.phraseLiveData.value!!.score=3
+            dataBinding.actionOk.id -> {
+                viewModel.phraseLiveData.value!!.score = 3
                 viewModel.phraseLiveData.value!!.last = false
                 viewModel.next()
             }
-            dataBinding.actionUnsure.id->{
-                viewModel.phraseLiveData.value!!.score=viewModel.phraseLiveData.value!!.score+1
+            dataBinding.actionUnsure.id -> {
+                viewModel.phraseLiveData.value!!.score = viewModel.phraseLiveData.value!!.score + 1
                 viewModel.phraseLiveData.value!!.last = false
                 viewModel.next()
             }
-            dataBinding.actionSkip.id->{
-                viewModel.phraseLiveData.value!!.score=3
+            dataBinding.actionSkip.id -> {
+                viewModel.phraseLiveData.value!!.score = 3
                 viewModel.phraseLiveData.value!!.last = true
                 viewModel.next()
             }
-            dataBinding.btnTestDontKnow.id->{
-                viewModel.phraseLiveData.value!!.score=viewModel.phraseLiveData.value!!.score-2
+            dataBinding.btnTestDontKnow.id -> {
+                viewModel.phraseLiveData.value!!.score = viewModel.phraseLiveData.value!!.score - 2
                 viewModel.phraseLiveData.value!!.last = false
                 viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_SHOW
             }
-            dataBinding.btnTestKnow.id->{
-                viewModel.phraseLiveData.value!!.score=3
+            dataBinding.btnTestKnow.id -> {
+                viewModel.phraseLiveData.value!!.score = 3
                 viewModel.phraseLiveData.value!!.last = true
                 viewModel.next()
             }
-            dataBinding.btnWriteDont.id->{
-                viewModel.phraseLiveData.value!!.score=1
+            dataBinding.btnWriteDont.id -> {
+                viewModel.phraseLiveData.value!!.score = 1
                 viewModel.phraseLiveData.value!!.last = false
                 viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_SHOW
             }
-            dataBinding.btnWriteDo.id->{
+            dataBinding.btnWriteDo.id -> {
                 viewModel.pass()
             }
 
         }
     }
 
-   private fun showFab(fab: FloatingActionButton, isVisible: Boolean) {
+    private fun showFab(fab: FloatingActionButton, isVisible: Boolean) {
         val layoutParams: ViewGroup.LayoutParams = fab.layoutParams
         if (layoutParams is CoordinatorLayout.LayoutParams) {
             val behavior = layoutParams.behavior

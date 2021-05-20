@@ -10,7 +10,8 @@ open class TypeConverter {
 
     @TypeConverter
     fun getExamplesFromString(value: String?): MutableList<String> {
-        return gson.fromJson<MutableList<String>>(value,
+        return gson.fromJson<MutableList<String>>(
+            value,
             object : TypeToken<MutableList<String>>() {}.type
         )
     }
@@ -22,7 +23,8 @@ open class TypeConverter {
 
     @TypeConverter
     fun getExplainsFromString(value: String?): MutableList<Explain> {
-        return gson.fromJson<MutableList<Explain>>(value,
+        return gson.fromJson<MutableList<Explain>>(
+            value,
             object : TypeToken<MutableList<Explain>>() {}.type
         )
     }

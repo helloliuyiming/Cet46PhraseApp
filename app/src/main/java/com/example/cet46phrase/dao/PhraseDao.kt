@@ -10,7 +10,7 @@ interface PhraseDao {
     fun queryAll(): MutableList<Phrase>
 
     @Query("select * from phrase where phrase like '%'||:keyWord||'%'")
-    fun queryByKeyWord(keyWord:String):MutableList<Phrase>
+    fun queryByKeyWord(keyWord: String): MutableList<Phrase>
 
 //    @Query("select * from phrase where phrase like '%'||:keyWord||'%'")
 //    fun queryByKeyWordLiveData(keyWord:String):MutableLiveData<MutableList<Phrase>>

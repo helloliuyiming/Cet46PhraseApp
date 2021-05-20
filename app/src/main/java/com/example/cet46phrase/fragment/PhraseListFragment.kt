@@ -23,7 +23,7 @@ class PhraseListFragment : Fragment() {
 
     lateinit var viewModel: FragmentLearnViewModel
     lateinit var dataBinding: FragmentPhraseListBinding
-    lateinit var adapter:RecyclerView.Adapter<ItemPhraseListViewHolder>
+    lateinit var adapter: RecyclerView.Adapter<ItemPhraseListViewHolder>
     private var lastOffset = 0
     private var lastPosition = 0
 
@@ -63,7 +63,7 @@ class PhraseListFragment : Fragment() {
         super.onStart()
         if (dataBinding.rvPhrase.layoutManager != null && lastPosition >= 0) {
             val linearLayoutManager = dataBinding.rvPhrase.layoutManager as LinearLayoutManager
-            linearLayoutManager.scrollToPositionWithOffset(lastPosition,lastOffset)
+            linearLayoutManager.scrollToPositionWithOffset(lastPosition, lastOffset)
         }
     }
 
@@ -77,9 +77,10 @@ class PhraseListFragment : Fragment() {
                 lastPosition = linearLayoutManager.getPosition(topView)
             }
         }
-        Log.i("main","onStop():lastPosition:${lastPosition}; lastOffset:${lastOffset}")
+        Log.i("main", "onStop():lastPosition:${lastPosition}; lastOffset:${lastOffset}")
     }
-    private fun initView(){
+
+    private fun initView() {
         dataBinding.rvPhrase.layoutManager = LinearLayoutManager(context)
         adapter = object : RecyclerView.Adapter<ItemPhraseListViewHolder>() {
             override fun onCreateViewHolder(
@@ -104,24 +105,27 @@ class PhraseListFragment : Fragment() {
                     stringBuild.append(it.explain)
                     stringBuild.append("\n")
                 }
-                stringBuild.deleteCharAt(stringBuild.length-1)
+                stringBuild.deleteCharAt(stringBuild.length - 1)
                 dataBinding.tvExplains.text = stringBuild
                 dataBinding.root.setOnClickListener {
                     val bundle = Bundle()
-                    bundle.putSerializable("phrase",phrase)
-                    findNavController().navigate(R.id.action_phraseListFragment_to_learnFragment,bundle)
+                    bundle.putSerializable("phrase", phrase)
+                    findNavController().navigate(
+                        R.id.action_phraseListFragment_to_learnFragment,
+                        bundle
+                    )
                 }
             }
 
             override fun getItemCount(): Int {
-                return if (viewModel.phraseListLiveData.value==null) 0 else viewModel.phraseListLiveData.value!!.size
+                return if (viewModel.phraseListLiveData.value == null) 0 else viewModel.phraseListLiveData.value!!.size
             }
         }
         dataBinding.rvPhrase.addItemDecoration(SpacesItemDecoration(10))
         dataBinding.rvPhrase.adapter = adapter
     }
 
-    private fun initToolbar(){
+    private fun initToolbar() {
         val activity = requireActivity() as AppCompatActivity
         activity.setSupportActionBar(dataBinding.toolbar)
         val actionBar = activity.supportActionBar
@@ -130,20 +134,22 @@ class PhraseListFragment : Fragment() {
         actionBar?.setDisplayShowTitleEnabled(true)
 
     }
-    private fun initListener(){
+
+    private fun initListener() {
 
     }
 
     private fun onSubscribe() {
         Log.d("main", "onSubscribe() called:${this}")
-        viewModel.phraseListLiveData.observe(viewLifecycleOwner){
-            if (it==null) return@observe
-            Log.i("main","adapter.notifyDataSetChanged()")
+        viewModel.phraseListLiveData.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
+            Log.i("main", "adapter.notifyDataSetChanged()")
             adapter.notifyDataSetChanged()
         }
     }
 
 
-   inner class ItemPhraseListViewHolder(val dataBinding:ItemPhraseListBinding):RecyclerView.ViewHolder(dataBinding.root)
+    inner class ItemPhraseListViewHolder(val dataBinding: ItemPhraseListBinding) :
+        RecyclerView.ViewHolder(dataBinding.root)
 
 }

@@ -16,17 +16,18 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 class FragmentMainViewModel(application: Application) : AndroidViewModel(application) {
     private val context = application
     private val gson = Gson()
-    var verbUnitList:MutableList<String>? = null
-    var prepUnitList:MutableList<String>? = null
-    var otherUnitList:MutableList<String>? = null
+    var verbUnitList: MutableList<String>? = null
+    var prepUnitList: MutableList<String>? = null
+    var otherUnitList: MutableList<String>? = null
     val followUnitLiveData: MutableLiveData<MutableMap<String, MutableList<String>>> =
         MutableLiveData()
-    val searchPhrasesLiveData:MutableLiveData<MutableList<Phrase>> = MutableLiveData()
+    val searchPhrasesLiveData: MutableLiveData<MutableList<Phrase>> = MutableLiveData()
     val phraseDao = AppDatabase.getInstance(application).phraseDao()
-    val order:Boolean
+    val order: Boolean
+
     init {
-        val config =application.getSharedPreferences("config",Context.MODE_PRIVATE)
-        order = config.getBoolean("order",false)
+        val config = application.getSharedPreferences("config", Context.MODE_PRIVATE)
+        order = config.getBoolean("order", false)
     }
 
     fun load() {
@@ -40,13 +41,14 @@ class FragmentMainViewModel(application: Application) : AndroidViewModel(applica
             return
         }
         val followMap = gson.fromJson<MutableMap<String, MutableList<String>>>(string,
-            object : TypeToken<MutableMap<String, MutableList<String>>>() {}.type)
+            object : TypeToken<MutableMap<String, MutableList<String>>>() {}.type
+        )
         followMap.forEach {
             if (it.key == "verb_phrase") {
                 verbUnitList = it.value
-            }else if (it.key == "prep_phrase") {
+            } else if (it.key == "prep_phrase") {
                 prepUnitList = it.value
-            }else if (it.key == "other_phrase") {
+            } else if (it.key == "other_phrase") {
                 otherUnitList = it.value
             }
         }
@@ -62,9 +64,9 @@ class FragmentMainViewModel(application: Application) : AndroidViewModel(applica
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                       searchPhrasesLiveData.value = it
-            },{
-                Log.e("main","searchPhraseByKeyWord() ERROR:${it.message}")
+                searchPhrasesLiveData.value = it
+            }, {
+                Log.e("main", "searchPhraseByKeyWord() ERROR:${it.message}")
                 it.printStackTrace()
             })
     }

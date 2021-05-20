@@ -29,7 +29,7 @@ class MainFragment : Fragment() {
     lateinit var dataBinding: FragmentMainBinding
     lateinit var viewModel: FragmentMainViewModel
     lateinit var unitAdapter: RecyclerView.Adapter<PhraseUnitViewHolder>
-    lateinit var searchAdapter:RecyclerView.Adapter<SearchPhraseViewHolder>
+    lateinit var searchAdapter: RecyclerView.Adapter<SearchPhraseViewHolder>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,18 +64,20 @@ class MainFragment : Fragment() {
         checkInit()
         checkFollow()
     }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.app_main,menu)
+        inflater.inflate(R.menu.app_main, menu)
         menu.findItem(R.id.menu_check_box_order).isChecked = viewModel.order
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_check_box_order->{
+            R.id.menu_check_box_order -> {
                 item.isChecked = !item.isChecked
-                val edit = requireContext().getSharedPreferences("config",Context.MODE_PRIVATE).edit()
-                edit.putBoolean("order",item.isChecked)
+                val edit =
+                    requireContext().getSharedPreferences("config", Context.MODE_PRIVATE).edit()
+                edit.putBoolean("order", item.isChecked)
                 edit.apply()
             }
         }
@@ -90,8 +92,9 @@ class MainFragment : Fragment() {
                 viewType: Int
             ): PhraseUnitViewHolder {
                 if (viewType == 1) {
-                    val inflate = layoutInflater.inflate(R.layout.item_phrase_category_title, parent, false)
-                    return PhraseUnitViewHolder(inflate,1)
+                    val inflate =
+                        layoutInflater.inflate(R.layout.item_phrase_category_title, parent, false)
+                    return PhraseUnitViewHolder(inflate, 1)
                 }
                 val inflate = layoutInflater.inflate(R.layout.item_phrase_unit, parent, false)
                 return PhraseUnitViewHolder(inflate, 2)
@@ -99,23 +102,23 @@ class MainFragment : Fragment() {
 
             override fun onBindViewHolder(holder: PhraseUnitViewHolder, position: Int) {
                 var mPosition = position
-                var itemType:String? = null
+                var itemType: String? = null
                 if (viewModel.verbUnitList != null && viewModel.verbUnitList!!.isNotEmpty()) {
                     if (mPosition < viewModel.verbUnitList!!.size) {
                         itemType = "动词词组"
-                    }else{
-                        mPosition-=viewModel.verbUnitList!!.size
+                    } else {
+                        mPosition -= viewModel.verbUnitList!!.size
                     }
                 }
-                if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty()&&itemType==null) {
+                if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty() && itemType == null) {
                     if (mPosition < viewModel.prepUnitList!!.size) {
                         itemType = "介词词组"
-                    }else{
-                        mPosition -=viewModel.prepUnitList!!.size
+                    } else {
+                        mPosition -= viewModel.prepUnitList!!.size
                     }
                 }
 
-                if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty()&&itemType==null) {
+                if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty() && itemType == null) {
                     if (mPosition < viewModel.otherUnitList!!.size) {
                         itemType = "其他词组"
                     }
@@ -129,32 +132,32 @@ class MainFragment : Fragment() {
                     return
                 }
                 mPosition = position
-                var itemUnit:String? = null
+                var itemUnit: String? = null
                 holder.itemView.isClickable = false
                 holder.checkBox?.visibility = View.GONE
                 if (viewModel.verbUnitList != null && viewModel.verbUnitList!!.isNotEmpty()) {
                     mPosition--
                     if (mPosition < viewModel.verbUnitList!!.size) {
-                        itemUnit =   viewModel.verbUnitList!![mPosition]
-                    }else{
-                        mPosition -=viewModel.verbUnitList!!.size
+                        itemUnit = viewModel.verbUnitList!![mPosition]
+                    } else {
+                        mPosition -= viewModel.verbUnitList!!.size
                     }
                 }
-                if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty()&&itemUnit==null) {
+                if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty() && itemUnit == null) {
                     mPosition--
                     if (mPosition < viewModel.prepUnitList!!.size) {
-                        itemUnit =   viewModel.prepUnitList!![mPosition]
-                    }else{
-                        mPosition -=viewModel.prepUnitList!!.size
+                        itemUnit = viewModel.prepUnitList!![mPosition]
+                    } else {
+                        mPosition -= viewModel.prepUnitList!!.size
                     }
                 }
 
-                if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty()&&itemUnit==null) {
+                if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty() && itemUnit == null) {
                     mPosition--
                     if (mPosition < viewModel.otherUnitList!!.size) {
-                        itemUnit =   viewModel.otherUnitList!![mPosition]
-                    }else{
-                        mPosition -=viewModel.otherUnitList!!.size
+                        itemUnit = viewModel.otherUnitList!![mPosition]
+                    } else {
+                        mPosition -= viewModel.otherUnitList!!.size
                     }
                 }
 
@@ -164,13 +167,13 @@ class MainFragment : Fragment() {
             override fun getItemCount(): Int {
                 var count = 0
                 if (viewModel.verbUnitList != null && viewModel.verbUnitList!!.isNotEmpty()) {
-                    count+=viewModel.verbUnitList!!.size+1
+                    count += viewModel.verbUnitList!!.size + 1
                 }
                 if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty()) {
-                    count+=viewModel.prepUnitList!!.size+1
+                    count += viewModel.prepUnitList!!.size + 1
                 }
                 if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty()) {
-                    count+=viewModel.otherUnitList!!.size+1
+                    count += viewModel.otherUnitList!!.size + 1
                 }
                 return count
             }
@@ -181,20 +184,20 @@ class MainFragment : Fragment() {
                     if (mPositon == 0) {
                         return 1
                     }
-                    mPositon = mPositon-viewModel.verbUnitList!!.size-1
+                    mPositon = mPositon - viewModel.verbUnitList!!.size - 1
                 }
                 if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty()) {
                     if (mPositon == 0) {
                         return 1
                     }
-                    mPositon = mPositon-viewModel.prepUnitList!!.size-1
+                    mPositon = mPositon - viewModel.prepUnitList!!.size - 1
                 }
 
                 if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty()) {
                     if (mPositon == 0) {
                         return 1
                     }
-                    mPositon = mPositon-viewModel.otherUnitList!!.size-1
+                    mPositon = mPositon - viewModel.otherUnitList!!.size - 1
                 }
 
                 return 2
@@ -203,52 +206,64 @@ class MainFragment : Fragment() {
         dataBinding.rvBoard.adapter = unitAdapter
 
         dataBinding.rvSearchPhrase.layoutManager = LinearLayoutManager(context)
-        searchAdapter = object :RecyclerView.Adapter<SearchPhraseViewHolder>(){
+        searchAdapter = object : RecyclerView.Adapter<SearchPhraseViewHolder>() {
             override fun onCreateViewHolder(
                 parent: ViewGroup,
                 viewType: Int
             ): SearchPhraseViewHolder {
-                val dataBinding = DataBindingUtil.inflate<ItemPhraseSearchBinding>(layoutInflater,R.layout.item_phrase_search,parent,false)
+                val dataBinding = DataBindingUtil.inflate<ItemPhraseSearchBinding>(
+                    layoutInflater,
+                    R.layout.item_phrase_search,
+                    parent,
+                    false
+                )
                 return SearchPhraseViewHolder(dataBinding)
             }
 
             override fun onBindViewHolder(holder: SearchPhraseViewHolder, position: Int) {
-                if (viewModel.searchPhrasesLiveData.value==null) return
+                if (viewModel.searchPhrasesLiveData.value == null) return
                 val phrase = viewModel.searchPhrasesLiveData.value!![position]
                 val dataBinding = holder.dataBinding
                 dataBinding.tvPhrase.text = phrase.phrase
                 dataBinding.root.setOnClickListener {
                     val bundle = Bundle()
-                    bundle.putSerializable("phrase",phrase)
-                    findNavController().navigate(R.id.action_mainFragment_to_learnFragment,bundle)
+                    bundle.putSerializable("phrase", phrase)
+                    findNavController().navigate(R.id.action_mainFragment_to_learnFragment, bundle)
                 }
             }
 
             override fun getItemCount(): Int {
-                return if (viewModel.searchPhrasesLiveData.value==null) 0 else viewModel.searchPhrasesLiveData.value!!.size
+                return if (viewModel.searchPhrasesLiveData.value == null) 0 else viewModel.searchPhrasesLiveData.value!!.size
             }
 
         }
         dataBinding.rvSearchPhrase.adapter = searchAdapter
     }
 
-    private fun initToolbar(){
+    private fun initToolbar() {
         val activity = requireActivity() as AppCompatActivity
         activity.setSupportActionBar(dataBinding.toolbar)
         val actionBar = activity.supportActionBar
         actionBar?.setDisplayShowTitleEnabled(true)
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        val mDrawerToggle = ActionBarDrawerToggle(activity,dataBinding.drawerLayout,dataBinding.toolbar,R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        val mDrawerToggle = ActionBarDrawerToggle(
+            activity,
+            dataBinding.drawerLayout,
+            dataBinding.toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
         dataBinding.drawerLayout.addDrawerListener(mDrawerToggle)
         mDrawerToggle.syncState()
     }
+
     private fun initListener() {
         dataBinding.btnEdit.setOnClickListener { findNavController().navigate(R.id.action_mainFragment_to_selectFragment) }
         dataBinding.btnAction.setOnClickListener { findNavController().navigate(R.id.action_mainFragment_to_learnFragment) }
         dataBinding.btnReview.setOnClickListener {
             val bundle = Bundle()
-            bundle.putBoolean("isReviewMode",true)
-            findNavController().navigate(R.id.action_mainFragment_to_learnFragment,bundle)
+            bundle.putBoolean("isReviewMode", true)
+            findNavController().navigate(R.id.action_mainFragment_to_learnFragment, bundle)
         }
         dataBinding.btnPhraseList.setOnClickListener {
             findNavController().navigate(R.id.action_mainFragment_to_phraseListFragment)
@@ -256,25 +271,27 @@ class MainFragment : Fragment() {
 
         dataBinding.searchView.setIconifiedByDefault(false)
         dataBinding.searchView.setOnQueryTextFocusChangeListener { v, hasFocus ->
-            Log.i("main","searchView.hasFocus:$hasFocus")
+            Log.i("main", "searchView.hasFocus:$hasFocus")
             dataBinding.searchView
             if (hasFocus) {
                 dataBinding.rvSearchPhrase.visibility = View.VISIBLE
-            }else{
+            } else {
                 dataBinding.rvSearchPhrase.visibility = View.GONE
                 //TODO close keyboard
-                val inputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager.hideSoftInputFromWindow(v.windowToken,0)
+                val inputMethodManager =
+                    requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
             }
         }
-        dataBinding.searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener{
+        dataBinding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return true
             }
+
             override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText != null&& newText.isNotEmpty()) {
+                if (newText != null && newText.isNotEmpty()) {
                     viewModel.searchPhraseByKeyWord(newText)
-                }else{
+                } else {
                     viewModel.searchPhrasesLiveData.value = null
                 }
 
@@ -284,7 +301,7 @@ class MainFragment : Fragment() {
     }
 
     private fun onSubscribe() {
-        viewModel.searchPhrasesLiveData.observe(viewLifecycleOwner){
+        viewModel.searchPhrasesLiveData.observe(viewLifecycleOwner) {
             searchAdapter.notifyDataSetChanged()
         }
     }
@@ -298,7 +315,8 @@ class MainFragment : Fragment() {
             findNavController().navigate(R.id.action_mainFragment_to_loadDataFragment)
         }
     }
-    private fun checkFollow(){
+
+    private fun checkFollow() {
         if ((viewModel.verbUnitList == null || viewModel.verbUnitList!!.isEmpty()) && (viewModel.prepUnitList == null || viewModel.prepUnitList!!.isEmpty()) && (viewModel.otherUnitList == null || viewModel.otherUnitList!!.isEmpty())) {
             if (findNavController().currentDestination?.id == R.id.mainFragment) {
                 findNavController().navigate(R.id.action_mainFragment_to_selectFragment)
@@ -307,15 +325,17 @@ class MainFragment : Fragment() {
     }
 
 
-    inner class SearchPhraseViewHolder(val dataBinding: ItemPhraseSearchBinding):RecyclerView.ViewHolder(dataBinding.root)
+    inner class SearchPhraseViewHolder(val dataBinding: ItemPhraseSearchBinding) :
+        RecyclerView.ViewHolder(dataBinding.root)
+
     inner class PhraseUnitViewHolder(itemView: View, viewType: Int) :
         RecyclerView.ViewHolder(itemView) {
         var type: TextView? = null
         var unit: TextView? = null
         var progress: ProgressBar? = null
         var flag: ImageView? = null
-        var title:TextView? = null
-        var checkBox:CheckBox? = null
+        var title: TextView? = null
+        var checkBox: CheckBox? = null
 
         init {
             if (viewType == 2) {
@@ -324,7 +344,7 @@ class MainFragment : Fragment() {
                 progress = itemView.findViewById(R.id.progressBar_unit)
                 flag = itemView.findViewById(R.id.iv_unit_flag)
                 checkBox = itemView.findViewById(R.id.checkbox)
-            }else if (viewType == 1) {
+            } else if (viewType == 1) {
                 title = itemView.findViewById(R.id.tv_title)
             }
         }

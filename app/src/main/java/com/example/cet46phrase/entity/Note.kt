@@ -4,10 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-class Note{
+class Note {
     @PrimaryKey(autoGenerate = true)
-    var id:Int = 0
-    lateinit var phrase:String
-    lateinit var content:String
-    var createdTime:Long = System.currentTimeMillis()
+    var id: Int = 0
+    lateinit var phrase: String
+    lateinit var content: String
+    var createdTime: Long = System.currentTimeMillis()
 }

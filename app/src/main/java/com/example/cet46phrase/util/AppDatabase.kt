@@ -9,10 +9,10 @@ import com.example.cet46phrase.dao.PhraseDao
 import com.example.cet46phrase.entity.Note
 import com.example.cet46phrase.entity.Phrase
 
-@Database(entities = [Phrase::class,Note::class], version = 1)
+@Database(entities = [Phrase::class, Note::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun phraseDao(): PhraseDao
-    abstract fun noteDao():NoteDao
+    abstract fun noteDao(): NoteDao
 
     companion object {
         private var database: AppDatabase? = null
