@@ -30,6 +30,7 @@ import com.example.cet46phrase.viewmodel.FragmentLearnViewModel
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlin.random.Random
 
 class LearnFragment : Fragment(), View.OnClickListener {
 
@@ -39,6 +40,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
     lateinit var explainAdapter: RecyclerView.Adapter<ItemExplainViewHolder>
     lateinit var actionBar: ActionBar
     lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
+    val random = Random
 
     @SuppressLint("UseRequireInsteadOfGet")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -333,9 +335,11 @@ class LearnFragment : Fragment(), View.OnClickListener {
                     dataBinding.tvWritePhrase.visibility = View.GONE
                     dataBinding.tvWriteAnswer.visibility = View.GONE
                     dataBinding.tvWritePhrase.text = phrase.phrase
-                    if (phrase.explains.get(0).examples.isNotEmpty()) {
-                        dataBinding.btnWriteExample.text = phrase.explains[0].examples[0].cn
-                        dataBinding.tvWriteAnswer.text = phrase.explains[0].examples[0].en
+
+                    val explainPosition = random.nextInt(phrase.explains.size)
+                    if (phrase.explains[explainPosition].examples.isNotEmpty()) {
+                        dataBinding.btnWriteExample.text = phrase.explains[explainPosition].examples[0].en
+                        dataBinding.tvWriteAnswer.text = phrase.explains[explainPosition].examples[0].cn
                     }
                 }
                 else -> {
