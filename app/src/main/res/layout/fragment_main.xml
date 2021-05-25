@@ -130,8 +130,11 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigation_view"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            app:headerLayout="@layout/section_drawer_header"
+            app:menu="@menu/menu_drawer_left"
             android:layout_gravity="start" />
     </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

@@ -298,6 +298,21 @@ class MainFragment : Fragment() {
                 return true
             }
         })
+
+        dataBinding.navigationView.setNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.menu_item_rank->{
+
+                }
+                R.id.menu_item_record->{
+
+                }
+                R.id.menu_item_setting->{
+
+                }
+            }
+            true
+        }
     }
 
     private fun onSubscribe() {
