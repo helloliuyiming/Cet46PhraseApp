@@ -35,15 +35,22 @@
                     android:imeOptions="actionSearch"
                     app:defaultQueryHint="搜索"/>
             </androidx.appcompat.widget.Toolbar>
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_search_phrase"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/block_search_list"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
                 android:background="@color/white"
                 android:elevation="3dp"
                 android:translationZ="1dp"
-                android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/toolbar"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_search_phrase"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </androidx.core.widget.NestedScrollView>
+
+
             <Button
                 android:id="@+id/btn_review"
                 android:layout_width="wrap_content"

@@ -274,9 +274,9 @@ class MainFragment : Fragment() {
             Log.i("main", "searchView.hasFocus:$hasFocus")
             dataBinding.searchView
             if (hasFocus) {
-                dataBinding.rvSearchPhrase.visibility = View.VISIBLE
+                dataBinding.blockSearchList.visibility = View.VISIBLE
             } else {
-                dataBinding.rvSearchPhrase.visibility = View.GONE
+                dataBinding.blockSearchList.visibility = View.GONE
                 //TODO close keyboard
                 val inputMethodManager =
                     requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
