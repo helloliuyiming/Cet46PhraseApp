@@ -40,7 +40,8 @@ class FragmentMainViewModel(application: Application) : AndroidViewModel(applica
             followUnitLiveData.value = null
             return
         }
-        val followMap = gson.fromJson<MutableMap<String, MutableList<String>>>(string,
+        val followMap = gson.fromJson<MutableMap<String, MutableList<String>>>(
+            string,
             object : TypeToken<MutableMap<String, MutableList<String>>>() {}.type
         )
         followMap.forEach {

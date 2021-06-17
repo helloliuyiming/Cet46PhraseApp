@@ -338,8 +338,10 @@ class LearnFragment : Fragment(), View.OnClickListener {
 
                     val explainPosition = random.nextInt(phrase.explains.size)
                     if (phrase.explains[explainPosition].examples.isNotEmpty()) {
-                        dataBinding.btnWriteExample.text = phrase.explains[explainPosition].examples[0].en
-                        dataBinding.tvWriteAnswer.text = phrase.explains[explainPosition].examples[0].cn
+                        dataBinding.btnWriteExample.text =
+                            phrase.explains[explainPosition].examples[0].en
+                        dataBinding.tvWriteAnswer.text =
+                            phrase.explains[explainPosition].examples[0].cn
                     }
                 }
                 else -> {

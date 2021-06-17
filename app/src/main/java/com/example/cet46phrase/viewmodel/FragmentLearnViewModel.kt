@@ -53,7 +53,8 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
         }
         val sharedPreferences = context.getSharedPreferences("config", Context.MODE_PRIVATE)
         val followsJson = sharedPreferences.getString("follows", "")
-        followMap = gson.fromJson<MutableMap<String, MutableList<String>>>(followsJson,
+        followMap = gson.fromJson<MutableMap<String, MutableList<String>>>(
+            followsJson,
             object : TypeToken<MutableMap<String, MutableList<String>>>() {}.type
         )
         Single.create<Boolean> {

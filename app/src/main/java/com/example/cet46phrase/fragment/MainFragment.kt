@@ -301,13 +301,13 @@ class MainFragment : Fragment() {
 
         dataBinding.navigationView.setNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.menu_item_rank->{
+                R.id.menu_item_rank -> {
 
                 }
-                R.id.menu_item_record->{
+                R.id.menu_item_record -> {
 
                 }
-                R.id.menu_item_setting->{
+                R.id.menu_item_setting -> {
 
                 }
             }
