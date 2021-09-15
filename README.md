@@ -6,10 +6,10 @@
 
 ## 效果展示
 
-[首页图片](images/Screenshot_1631699941.png)
-[选择单元](images/Screenshot_1631699978.png)
-[单元词组预览](images/Screenshot_1631699986.png)
-[词组详情](images/Screenshot_1631699994.png)
-[添加笔记](images/Screenshot_1631700370.png)
-[显示笔记](images/Screenshot_1631700399.png)
+![首页图片](images/Screenshot_1631699941.png)
+![选择单元](images/Screenshot_1631699978.png)
+![单元词组预览](images/Screenshot_1631699986.png)
+![词组详情](images/Screenshot_1631699994.png)
+![添加笔记](images/Screenshot_1631700370.png)
+![显示笔记](images/Screenshot_1631700399.png)
 
