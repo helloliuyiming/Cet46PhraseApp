@@ -1,0 +1,21 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="基本">
+
+        <EditTextPreference
+            app:key="setting_username"
+            app:title="用户名"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="female"
+            app:entries="@array/gender_entries"
+            app:entryValues="@array/gender_values"
+            app:key="setting_gender"
+            app:title="性别"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

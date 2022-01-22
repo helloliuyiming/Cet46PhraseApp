@@ -116,7 +116,8 @@
                         app:layout_constraintBottom_toTopOf="@+id/textView2"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.498"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        tools:visibility="visible" />
 
                     <TextView
                         android:id="@+id/textView2"
@@ -127,7 +128,8 @@
                         android:textSize="16sp"
                         app:layout_constraintBottom_toTopOf="@+id/btn_test_dont_know"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        tools:visibility="visible" />
 
                     <Button
                         android:id="@+id/btn_test_dont_know"
@@ -137,9 +139,10 @@
                         android:text="不认识"
                         android:textColor="@color/white"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/btn_test_know"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/btn_test_know"
+                         />
 
                     <Button
                         android:id="@+id/btn_test_know"
@@ -149,9 +152,12 @@
                         android:text="认识"
                         android:textColor="@color/white"
                         app:layout_constraintBottom_toBottomOf="@+id/btn_test_dont_know"
-                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/btn_test_dont_know" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/btn_test_dont_know"
+
+
+                        tools:visibility="visible" />
 
                     <TextView
                         android:id="@+id/tv_test_answer"
@@ -162,7 +168,8 @@
                         android:text="TextView"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:visibility="visible" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -194,7 +201,8 @@
                         android:textSize="16sp"
                         app:layout_constraintBottom_toTopOf="@+id/btn_write_dont"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        tools:visibility="gone" />
 
                     <Button
                         android:id="@+id/btn_write_dont"
@@ -204,10 +212,11 @@
                         android:text="不可以"
                         android:textColor="@color/white"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/btn_write_do"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintHorizontal_chainStyle="spread"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintStart_toEndOf="@id/btn_write_do"
+                        tools:visibility="gone" />
 
                     <Button
                         android:id="@+id/btn_write_do"
@@ -217,9 +226,10 @@
                         android:text="可以"
                         android:textColor="@color/white"
                         app:layout_constraintBottom_toBottomOf="@+id/btn_write_dont"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/btn_write_dont"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/btn_write_dont" />
+
+                        app:layout_constraintStart_toStartOf="parent" />
 
                     <TextView
                         android:id="@+id/tv_write_phrase"

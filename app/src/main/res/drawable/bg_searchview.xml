@@ -3,7 +3,7 @@
     <!-- 角度 -->
     <corners android:radius="35dp"/>
     <!-- 填充色 -->
-    <solid android:color="@color/white"/>
+    <solid android:color="#fff"/>
     <!-- 描边 设置线宽及颜色 -->
     <stroke android:width="0.5dp" android:color="@color/accentColor"/>
 </shape>

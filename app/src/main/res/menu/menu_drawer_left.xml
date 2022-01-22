@@ -2,14 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/menu_item_rank"
-        android:icon="@drawable/ic_rank"
-        android:iconTint="@color/black"
-        android:title="排行" />
+        android:id="@+id/menu_item_ad"
+        android:icon="@drawable/ic_baseline_wb_sunny_24"
+        android:title="激励广告" />
+
     <item
-        android:id="@+id/menu_item_record"
-        android:icon="@drawable/ic_record"
-        android:title="记录" />
+        android:id="@+id/menu_item_notes"
+        android:icon="@drawable/ic_baseline_event_note_24"
+        android:title="笔记"/>
     <item
         android:id="@+id/menu_item_setting"
         android:icon="@drawable/ic_setting"

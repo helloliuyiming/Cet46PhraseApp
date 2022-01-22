@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.cet46phrase.fragment.MainFragment"
+        android:name="com.lixiangya.cet46phrase.fragment.MainFragment"
         android:label="MainFragment">
         <action
             android:id="@+id/action_mainFragment_to_loadDataFragment"
@@ -24,15 +24,15 @@
     </fragment>
     <fragment
         android:id="@+id/loadDataFragment"
-        android:name="com.example.cet46phrase.fragment.LoadDataFragment"
+        android:name="com.lixiangya.cet46phrase.fragment.LoadDataFragment"
         android:label="LoadDataFragment" />
     <fragment
         android:id="@+id/learnFragment"
-        android:name="com.example.cet46phrase.fragment.LearnFragment"
+        android:name="com.lixiangya.cet46phrase.fragment.LearnFragment"
         android:label="LearnFragment" />
     <fragment
         android:id="@+id/phraseListFragment"
-        android:name="com.example.cet46phrase.fragment.PhraseListFragment"
+        android:name="com.lixiangya.cet46phrase.fragment.PhraseListFragment"
         android:label="PhraseListFragment" >
         <action
             android:id="@+id/action_phraseListFragment_to_learnFragment"
@@ -40,7 +40,16 @@
     </fragment>
     <fragment
         android:id="@+id/selectFragment"
-        android:name="com.example.cet46phrase.fragment.SelectFragment"
+        android:name="com.lixiangya.cet46phrase.fragment.SelectFragment"
         android:label="fragment_select"
         tools:layout="@layout/fragment_select" />
+    <fragment
+        android:id="@+id/noteListFragment"
+        android:name="com.lixiangya.cet46phrase.fragment.NoteListFragment"
+        android:label="fragment_note_list"
+        tools:layout="@layout/fragment_note_list" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.lixiangya.cet46phrase.fragment.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>
