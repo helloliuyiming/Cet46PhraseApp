@@ -2,11 +2,11 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
-    id 'Orca'
+//    id 'Orca'
 }
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
     lintOptions{
@@ -44,20 +44,20 @@ android {
     }
 }
 
-Orca.go{
-    storeSet{
-        "data"{
-            value "123456"
-        }
-        "publicKey"{
-            value "I'mPublicKey"
-        }
-    }
-    encryptMode = "AES"
-    isDebug = true
-    signature = "CE:74:2A:B3:EF:AC:E3:01:52:2E:58:F7:24:A3:40:27:E3:3B:26:72:49:AA:D2:FE:76:CC:1D:0B:92:24:26:6F"
-    secretKey = "FTat46cvyia6758@243lid66wxzvwe23dgfhcfg76wsd@5as431aq1256dsaa211" //默认加密的加密秘钥
-}
+//Orca.go{
+//    storeSet{
+//        "data"{
+//            value "123456"
+//        }
+//        "publicKey"{
+//            value "I'mPublicKey"
+//        }
+//    }
+//    encryptMode = "AES"
+//    isDebug = true
+//    signature = "CE:74:2A:B3:EF:AC:E3:01:52:2E:58:F7:24:A3:40:27:E3:3B:26:72:49:AA:D2:FE:76:CC:1D:0B:92:24:26:6F"
+//    secretKey = "FTat46cvyia6758@243lid66wxzvwe23dgfhcfg76wsd@5as431aq1256dsaa211" //默认加密的加密秘钥
+//}
 
 dependencies {
 
@@ -68,7 +68,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'androidx.preference:preference-ktx:1.1.1'
     testImplementation 'junit:junit:'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'

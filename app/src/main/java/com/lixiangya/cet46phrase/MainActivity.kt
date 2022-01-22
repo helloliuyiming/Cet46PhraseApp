@@ -28,12 +28,5 @@ class MainActivity : AppCompatActivity() {
         )
 
 
-        val data = com.orcc.app.core.CoreClient.getData()
-        val publicKey = com.orcc.app.core.CoreClient.getPublicKey()
-        Toast.makeText(this,"data:$data",Toast.LENGTH_SHORT).show()
-        Toast.makeText(this,"publicKey:$publicKey",Toast.LENGTH_SHORT).show()
-        Log.i("main", "data:$data")
-        Log.i("main", "publicKey:$publicKey")
-
     }
 }
