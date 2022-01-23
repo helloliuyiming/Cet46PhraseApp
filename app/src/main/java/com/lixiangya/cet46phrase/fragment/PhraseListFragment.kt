@@ -13,9 +13,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.lixiangya.cet46phrase.R
 import com.lixiangya.cet46phrase.databinding.FragmentPhraseListBinding
 import com.lixiangya.cet46phrase.databinding.ItemPhraseListBinding
+import com.lixiangya.cet46phrase.util.PreferencesUtil
 import com.lixiangya.cet46phrase.util.SpacesItemDecoration
 import com.lixiangya.cet46phrase.viewmodel.FragmentLearnViewModel
 
@@ -27,10 +30,41 @@ class PhraseListFragment : Fragment() {
     private var lastOffset = 0
     private var lastPosition = 0
 
+    private val statusSpinnerItem:MutableList<String> = mutableListOf()
+    private val unitSpinnerItem:MutableList<String> = mutableListOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(FragmentLearnViewModel::class.java)
         setHasOptionsMenu(true)
+
+        statusSpinnerItem.addAll(arrayListOf("全部","学过","未学"))
+        unitSpinnerItem.add("全部")
+
+        val sharePreferences = PreferencesUtil.getSharePreferences(requireContext())
+        val json = sharePreferences.getString("follows", "")
+        val gson = Gson()
+        val jsonObject = gson.fromJson<JsonObject>(json, JsonObject::class.java)
+        jsonObject.get("verb_phrase")?.apply {
+            unitSpinnerItem.add("动组-全部")
+            this.asJsonArray.toMutableList().forEach {
+                unitSpinnerItem.add("动组-"+it.asString)
+            }
+        }
+
+        jsonObject.get("prep_phrase")?.apply {
+            unitSpinnerItem.add("介组-全部")
+            this.asJsonArray.toMutableList().forEach {
+                unitSpinnerItem.add("介组-"+it.asString)
+            }
+        }
+
+        jsonObject.get("other_phrase")?.apply {
+            unitSpinnerItem.add("其他-全部")
+            this.asJsonArray.toMutableList().forEach {
+                unitSpinnerItem.add("其他-"+it.asString)
+            }
+        }
     }
 
     override fun onCreateView(
@@ -81,6 +115,21 @@ class PhraseListFragment : Fragment() {
     }
 
     private fun initView() {
+
+
+
+        dataBinding.spinnerUnit.setItems(unitSpinnerItem)
+        dataBinding.spinnerStatus.setItems(statusSpinnerItem)
+
+        dataBinding.spinnerUnit.setOnItemSelectedListener { view, position, id, item ->
+            reload()
+        }
+
+        dataBinding.spinnerStatus.setOnItemSelectedListener { view, position, id, item ->
+            reload()
+        }
+
+
         dataBinding.rvPhrase.layoutManager = LinearLayoutManager(context)
         adapter = object : RecyclerView.Adapter<ItemPhraseListViewHolder>() {
             override fun onCreateViewHolder(
@@ -137,6 +186,50 @@ class PhraseListFragment : Fragment() {
 
     private fun initListener() {
 
+    }
+
+    private fun reload(){
+        val unitSelectedIndex = dataBinding.spinnerUnit.selectedIndex
+        val statusSelectedIndex = dataBinding.spinnerStatus.selectedIndex
+        val unitStr = unitSpinnerItem[unitSelectedIndex]
+        val statusStr = statusSpinnerItem[statusSelectedIndex]
+        val status = when (statusStr) {
+            "全部" -> {
+                0
+            }
+            "未学" -> {
+                1
+            }
+            else -> {
+                2
+            }
+        }
+        var type:String?
+        var unit:String?
+        if (unitStr == "全部") {
+            type=null
+            unit=null
+        }else{
+            val split = unitStr.split("-")
+            type = when (split[0]) {
+                "动组"->{
+                    "verb_phrase"
+                }
+                "介组"->{
+                    "prep_phrase"
+                }
+                else->{
+                    "other_phrase"
+                }
+            }
+            if (split[1] == "全部") {
+                unit = null
+            }else{
+                unit = split[1]
+            }
+        }
+
+        viewModel.reload(status = status, type = type, unit = unit)
     }
 
     private fun onSubscribe() {

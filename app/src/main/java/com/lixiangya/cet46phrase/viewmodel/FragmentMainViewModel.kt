@@ -6,12 +6,13 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.lixiangya.cet46phrase.entity.Phrase
-import com.lixiangya.cet46phrase.util.AppDatabase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.lixiangya.cet46phrase.util.PreferencesUtil
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
+import io.realm.Realm
 
 class FragmentMainViewModel(application: Application) : AndroidViewModel(application) {
     private val context = application
@@ -22,11 +23,10 @@ class FragmentMainViewModel(application: Application) : AndroidViewModel(applica
     val followUnitLiveData: MutableLiveData<MutableMap<String, MutableList<String>>> =
         MutableLiveData()
     val searchPhrasesLiveData: MutableLiveData<MutableList<Phrase>> = MutableLiveData()
-    val phraseDao = AppDatabase.getInstance(application).phraseDao()
-    val order: Boolean
+    var order: Boolean
 
     init {
-        val config = application.getSharedPreferences("config", Context.MODE_PRIVATE)
+        val config = PreferencesUtil.getSharePreferences(context)
         order = config.getBoolean("order", false)
     }
 
@@ -34,10 +34,10 @@ class FragmentMainViewModel(application: Application) : AndroidViewModel(applica
         verbUnitList = null
         prepUnitList = null
         otherUnitList = null
-        val sharedPreferences = context.getSharedPreferences("config", Context.MODE_PRIVATE)
+        val sharedPreferences = PreferencesUtil.getSharePreferences(context)
         val string = sharedPreferences.getString("follows", "")
         if (string == "") {
-            followUnitLiveData.value = null
+            followUnitLiveData.value = mutableMapOf()
             return
         }
         val followMap = gson.fromJson<MutableMap<String, MutableList<String>>>(
@@ -58,10 +58,16 @@ class FragmentMainViewModel(application: Application) : AndroidViewModel(applica
 
     fun searchPhraseByKeyWord(keyWord: String) {
         if (keyWord.trim().isEmpty()) {
-            searchPhrasesLiveData.value = null
+            searchPhrasesLiveData.value = mutableListOf()
         }
         Single.create<MutableList<Phrase>> {
-            it.onSuccess(phraseDao.queryByKeyWord(keyWord))
+            val realm = Realm.getDefaultInstance()
+            val findAll = realm.where(Phrase::class.java)
+                .contains("phrase", keyWord)
+                .findAll()
+            val copyFromRealm = realm.copyFromRealm(findAll)
+            realm.close()
+            it.onSuccess(copyFromRealm)
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({

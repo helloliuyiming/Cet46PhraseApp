@@ -8,20 +8,23 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.lixiangya.cet46phrase.entity.Note
 import com.lixiangya.cet46phrase.entity.Phrase
-import com.lixiangya.cet46phrase.util.AppDatabase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.lixiangya.cet46phrase.util.PreferencesUtil
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
+import io.realm.Realm
+import io.realm.RealmAny
 import java.util.*
 
 class FragmentLearnViewModel(application: Application) : AndroidViewModel(application) {
     val viewTypeLiveData: MutableLiveData<Int> = MutableLiveData()
-    val phraseLiveData: MutableLiveData<Phrase> = MutableLiveData()
+    val phraseLiveData: MutableLiveData<Phrase?> = MutableLiveData()
     val phraseListLiveData: MutableLiveData<MutableList<Phrase>> = MutableLiveData()
     val notesLiveData: MutableLiveData<MutableList<Note>> = MutableLiveData()
-    val editNoteLiveData: MutableLiveData<Note> = MutableLiveData()
+    val editNoteLiveData: MutableLiveData<Note?> = MutableLiveData()
     var deepLinkSignal: Boolean = false
     var reviewModeSignal: Boolean = false
     var count = 0
@@ -31,16 +34,9 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     private val context = application
     private val phraseQueue: Queue<Phrase> = LinkedList<Phrase>()
     private val activePhraseQueue: Queue<Phrase> = LinkedList<Phrase>()
-    private val phraseDao = AppDatabase.getInstance(application).phraseDao()
-    private val noteDao = AppDatabase.getInstance(application).noteDao()
-    private lateinit var followMap: MutableMap<String, MutableList<String>>
     private val gson = Gson()
-    private val order: Boolean
+    private val order: Boolean = PreferencesUtil.getSharePreferences(application).getBoolean("order", false)
 
-    init {
-        val sharedPreferences = application.getSharedPreferences("config", Context.MODE_PRIVATE)
-        order = sharedPreferences.getBoolean("order", false)
-    }
 
     fun load() {
         if (deepLinkSignal) {
@@ -51,26 +47,65 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
             next()
             return
         }
-        val sharedPreferences = context.getSharedPreferences("config", Context.MODE_PRIVATE)
-        val followsJson = sharedPreferences.getString("follows", "")
-        followMap = gson.fromJson<MutableMap<String, MutableList<String>>>(
-            followsJson,
-            object : TypeToken<MutableMap<String, MutableList<String>>>() {}.type
-        )
+
         Single.create<Boolean> {
             val list: MutableList<Phrase> = mutableListOf()
-            followMap.forEach {
-                val type = it.key
-                it.value.forEach {
-                    list.addAll(phraseDao.queryByUnitAndType(it, type))
+            val realm = Realm.getDefaultInstance()
+
+            var newPhrase = mutableListOf<Phrase>()
+            if (!reviewModeSignal) {
+                val newPhraseRealm = realm.where(Phrase::class.java)
+                    .equalTo("isActive", true)
+                    .equalTo("level", "0".toInt())
+                    .findAll()
+                newPhrase = realm.copyFromRealm(newPhraseRealm)
+                if (!order) {
+                    newPhrase.shuffle()
                 }
             }
+
+            val reviewListRealm = realm.where(Phrase::class.java)
+                .between("reviewDate", today(), tomorrow())
+                .findAll()
+
+            val reviewPhrase:MutableList<Phrase> = realm.copyFromRealm(reviewListRealm)
+
+
+            val newSize = newPhrase.size
+            val reviewSize = reviewPhrase.size
+            var newProgress = 1F
+            var reviewProgress = 1F
+            val length = newSize+reviewSize
+            for (i in 0..length) {
+                if (newPhrase.size == 0 && reviewPhrase.size == 0) {
+                    break
+                }
+                if (newPhrase.size == 0 && reviewPhrase.size != 0) {
+                    list.add(reviewPhrase[0])
+                    reviewPhrase.removeAt(0)
+                    continue
+                }
+                if (newPhrase.size != 0 && reviewPhrase.size == 0) {
+                    list.add(newPhrase[0])
+                    newPhrase.removeAt(0)
+                    continue
+                }
+                if (newProgress / newSize < reviewProgress / reviewSize) {
+                    list.add(newPhrase[0])
+                    newPhrase.removeAt(0)
+                    newProgress++
+                }else{
+                    list.add(reviewPhrase[0])
+                    reviewPhrase.removeAt(0)
+                    reviewProgress++
+                }
+            }
+
             count = list.size
             completedLiveData.postValue(completedLiveData.value)
             if (!order) {
                 list.shuffle()
             }
-            Log.i("main", "phraseListLiveData.postValue(list)")
             phraseListLiveData.postValue(list)
             list.forEach {
                 if (reviewModeSignal) {
@@ -92,7 +127,42 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
                 Log.e("main", "${it.message}")
                 it.printStackTrace()
             })
+    }
 
+    fun reload(isActive: Boolean = true,status:Int = 0,type:String? = null,unit:String? = null) {
+
+        Observable.create<MutableList<Phrase>> {
+            val realm = Realm.getDefaultInstance()
+            val where = realm.where(Phrase::class.java)
+            if (isActive) {
+                where.equalTo("isActive",true)
+            }
+            if (status!=0) {
+
+                if (status == 1) {
+                    where.equalTo("reviewDate", RealmAny.nullValue())
+                }else{
+                    where.notEqualTo("reviewDate", RealmAny.nullValue())
+                }
+
+            }
+            if (type != null) {
+                where.equalTo("type",type)
+            }
+            if (unit != null) {
+                where.equalTo("unit",unit)
+            }
+
+            val phraseListRealm = where.findAll()
+            val list= mutableListOf<Phrase>()
+            list.addAll(realm.copyFromRealm(phraseListRealm))
+            realm.close()
+            it.onNext(list)
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                phraseListLiveData.value = it
+            }
     }
 
     fun next() {
@@ -114,10 +184,10 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     }
 
     fun pass() {
-
+        //TODO 计算下次复习时间
         if (activePhraseQueue.size == 0 && phraseQueue.size == 0) {
             done = true
-            phraseLiveData.value = null
+            phraseLiveData.value = Phrase()
             return
         }
         if (activePhraseQueue.size == 0 && phraseQueue.size > 0) {
@@ -153,10 +223,15 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     }
 
     fun loadNote(phrase: String) {
-        notesLiveData.value = null
+
         Single.create<MutableList<Note>> {
-            val queryByPhrase = noteDao.queryByPhrase(phrase)
-            it.onSuccess(queryByPhrase)
+            val realm = Realm.getDefaultInstance()
+            val findAll = realm.where(Note::class.java)
+                .equalTo("phrase", phrase)
+                .findAll()
+            val copyFromRealm = realm.copyFromRealm(findAll)
+            realm.close()
+            it.onSuccess(copyFromRealm)
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -169,7 +244,12 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
 
     fun saveNote(note: Note) {
         Single.create<Boolean> {
-            noteDao.insert(note)
+            note.id = UUID.randomUUID().toString()
+            val realm = Realm.getDefaultInstance();
+            realm.executeTransaction {
+                realm.copyToRealmOrUpdate(note)
+            }
+            realm.close()
             it.onSuccess(true)
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -185,7 +265,11 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
 
     fun updateNote(note: Note) {
         Single.create<Boolean> {
-            noteDao.update(note)
+            val realm = Realm.getDefaultInstance()
+            realm.executeTransaction {
+                realm.insertOrUpdate(note)
+            }
+            realm.close()
             it.onSuccess(true)
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -201,7 +285,14 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
 
     fun deleteNote(note: Note) {
         Single.create<Boolean> {
-            noteDao.delete(note)
+            val realm = Realm.getDefaultInstance()
+            realm.executeTransaction {
+                realm.where(Note::class.java)
+                    .equalTo("id",note.id)
+                    .findAll()
+                    .deleteAllFromRealm()
+            }
+            realm.close()
             it.onSuccess(true)
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -217,8 +308,13 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
 
     fun loadPhrase(string: String) {
         Single.create<Phrase>{
-            var queryByKeyWord = phraseDao.queryByPhrase(string)
-            it.onSuccess(queryByKeyWord)
+            val realm = Realm.getDefaultInstance()
+            val findFirst = realm.where(Phrase::class.java)
+                .equalTo("phrase", string)
+                .findFirst()
+            val copyFromRealm = realm.copyFromRealm(findFirst)
+            realm.close()
+            it.onSuccess(copyFromRealm)
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -235,4 +331,23 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
         const val VIEW_TYPE_WRITE = 3
     }
 
+    private fun today():Date{
+        val calendar: Calendar = Calendar.getInstance()
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val todayZero: Long = calendar.timeInMillis
+        return Date(todayZero)
+    }
+
+    private fun tomorrow():Date{
+        val calendar: Calendar = Calendar.getInstance()
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val todayZero: Long = calendar.timeInMillis+86400000
+        return Date(todayZero)
+    }
 }

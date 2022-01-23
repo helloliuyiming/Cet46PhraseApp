@@ -1,12 +1,12 @@
 package com.lixiangya.cet46phrase.entity
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 
-@Entity
-class Note {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+open class Note : RealmObject() {
+
+    @PrimaryKey
+    lateinit var id: String
     lateinit var phrase: String
     lateinit var content: String
     var createdTime: Long = System.currentTimeMillis()

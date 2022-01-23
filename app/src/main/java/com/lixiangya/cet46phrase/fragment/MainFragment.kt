@@ -22,6 +22,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.lixiangya.cet46phrase.R
 import com.lixiangya.cet46phrase.databinding.FragmentMainBinding
 import com.lixiangya.cet46phrase.databinding.ItemPhraseSearchBinding
+import com.lixiangya.cet46phrase.util.PreferencesUtil
 import com.lixiangya.cet46phrase.viewmodel.FragmentMainViewModel
 
 
@@ -37,7 +38,7 @@ class MainFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(FragmentMainViewModel::class.java)
+        viewModel = ViewModelProvider(this)[FragmentMainViewModel::class.java]
         setHasOptionsMenu(true)
 
 
@@ -116,8 +117,8 @@ class MainFragment : Fragment() {
         when (item.itemId) {
             R.id.menu_check_box_order -> {
                 item.isChecked = !item.isChecked
-                val edit =
-                    requireContext().getSharedPreferences("config", Context.MODE_PRIVATE).edit()
+                viewModel.order = item.isChecked
+                val edit = PreferencesUtil.getSharePreferences(requireContext()).edit()
                 edit.putBoolean("order", item.isChecked)
                 edit.apply()
             }
@@ -314,7 +315,6 @@ class MainFragment : Fragment() {
         dataBinding.searchView.setIconifiedByDefault(false)
         dataBinding.searchView.setOnQueryTextFocusChangeListener { v, hasFocus ->
             Log.i("main", "searchView.hasFocus:$hasFocus")
-            dataBinding.searchView
             if (hasFocus) {
                 dataBinding.blockSearchList.visibility = View.VISIBLE
             } else {
@@ -377,9 +377,8 @@ class MainFragment : Fragment() {
 
     private fun checkInit() {
         Log.d("main", "check() called")
-        val sharedPreferences =
-            requireContext().getSharedPreferences("config", Context.MODE_PRIVATE)
-        val init = sharedPreferences.getBoolean("init", false)
+        val sharePreferences = PreferencesUtil.getSharePreferences(requireContext())
+        val init = sharePreferences.getBoolean("init", false)
         if (!init) {
             findNavController().navigate(R.id.action_mainFragment_to_loadDataFragment)
         }

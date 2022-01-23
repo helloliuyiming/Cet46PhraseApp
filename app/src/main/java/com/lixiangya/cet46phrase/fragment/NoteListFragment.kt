@@ -15,29 +15,27 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.lixiangya.cet46phrase.R
-import com.lixiangya.cet46phrase.dao.NoteDao
 import com.lixiangya.cet46phrase.databinding.FragmentNoteListBinding
 import com.lixiangya.cet46phrase.databinding.ItemNoteBinding
 import com.lixiangya.cet46phrase.entity.Note
-import com.lixiangya.cet46phrase.util.AppDatabase
 import com.lixiangya.cet46phrase.util.SpacesItemDecoration
 import com.google.android.gms.ads.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
+import io.realm.Realm
+import io.realm.Sort
 
 
 class NoteListFragment : Fragment() {
 
     lateinit var dataBinding:FragmentNoteListBinding
-    private lateinit var noteDao:NoteDao
     private lateinit var noteAdapter:RecyclerView.Adapter<NoteViewHolder>
     private val noteData:MutableList<Note> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        noteDao = AppDatabase.getInstance(requireContext()).noteDao();
     }
 
 
@@ -105,8 +103,13 @@ class NoteListFragment : Fragment() {
 
     private fun loadNote(){
         Single.create<MutableList<Note>> {
-            val all = noteDao.queryAll()
-            it.onSuccess(all)
+            val realm = Realm.getDefaultInstance()
+            val findAll = realm.where(Note::class.java)
+                .sort("createdTime", Sort.DESCENDING)
+                .findAll()
+            val copyFromRealm = realm.copyFromRealm(findAll)
+            realm.close()
+            it.onSuccess(copyFromRealm)
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({

@@ -1,17 +1,15 @@
 package com.lixiangya.cet46phrase.entity
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.google.gson.annotations.Expose
+import io.realm.RealmList
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 import java.io.Serializable
+import java.util.*
 
-@Entity
-@TypeConverters(TypeConverter::class)
-class Phrase : Serializable {
-    @PrimaryKey(autoGenerate = true)
+open class Phrase : RealmObject(),Serializable {
+    @PrimaryKey
     var id: Int = 0
-    lateinit var explains: MutableList<Explain>
+    lateinit var explains: RealmList<Explain>
     var notice: String? = null
     lateinit var origin: String
     lateinit var phrase: String
@@ -19,11 +17,13 @@ class Phrase : Serializable {
     lateinit var type: String
     lateinit var unit: String
 
+    var reviewDate:Date? = null
 
-    @Expose
+    var isActive = false
+    var level:Int = 0;
+
     var score: Int = 0
 
-    @Expose
     var last = false
     var status = 0
 
@@ -40,14 +40,13 @@ class Phrase : Serializable {
     }
 }
 
-class Explain : Serializable {
-    //    @PrimaryKey(autoGenerate = true)
+open class Explain:RealmObject() ,Serializable {
     var id: Int = 0
     lateinit var explain: String
-    var examples: MutableList<Example> = mutableListOf()
+    var examples: RealmList<Example> = RealmList()
 }
 
-class Example : Serializable {
-    var cn: String? = null
-    var en: String? = null
+open class Example :RealmObject(), Serializable {
+    lateinit var cn: String
+    lateinit var en: String
 }

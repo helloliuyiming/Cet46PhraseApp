@@ -1,12 +1,15 @@
 package com.lixiangya.cet46phrase.fragment
 
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -76,13 +79,16 @@ class SelectFragment : Fragment() {
             }
 
             override fun onBindViewHolder(holder: PhraseUnitViewHolder, position: Int) {
+                val itemMap:MutableMap<String,String> = mutableMapOf<String,String>()
                 var mPosition = position
                 var itemType: String? = null
-                var itemUnit: String? = null
+                var itemUnit: String = ""
+                var type:String = ""
 
                 if (viewModel.verbUnitList != null && viewModel.verbUnitList!!.isNotEmpty()) {
                     if (mPosition <= viewModel.verbUnitList!!.size) {
                         itemType = "动词词组"
+                        type = "verb_phrase"
                         if (getItemViewType(position) == 2) {
                             itemUnit = viewModel.verbUnitList!![mPosition - 1]
                         }
@@ -93,6 +99,7 @@ class SelectFragment : Fragment() {
                 if (viewModel.prepUnitList != null && viewModel.prepUnitList!!.isNotEmpty() && itemType == null) {
                     if (mPosition <= viewModel.prepUnitList!!.size) {
                         itemType = "介词词组"
+                        type = "prep_phrase"
                         if (getItemViewType(position) == 2) {
                             try {
                                 itemUnit = viewModel.prepUnitList!![mPosition - 1]
@@ -108,6 +115,7 @@ class SelectFragment : Fragment() {
                 if (viewModel.otherUnitList != null && viewModel.otherUnitList!!.isNotEmpty() && itemType == null) {
                     if (mPosition <= viewModel.otherUnitList!!.size) {
                         itemType = "其他词组"
+                        type="other_phrase"
                         if (getItemViewType(position) == 2) {
                             itemUnit = viewModel.otherUnitList!![mPosition - 1]
                         }
@@ -127,43 +135,29 @@ class SelectFragment : Fragment() {
                     holder.checkBox?.visibility = View.VISIBLE
                 }
                 holder.unit?.text = itemUnit
+
+                itemMap["unit"] = itemUnit
+                itemMap["type"] = type
+
                 holder.itemView.setOnClickListener {
                     if (viewModel.actionModeLiveData.value == FragmentSelectViewModel.ACTION_MODE_SELECT_MULTIPLE) {
                         if (holder.checkBox?.isChecked!!) {
                             holder.checkBox?.isChecked = false
-                            viewModel.followCount--
+
+                            viewModel.followSet.remove(itemMap)
+
                         } else {
                             holder.checkBox?.isChecked = true
-                            viewModel.followCount++
+
+                            viewModel.followSet.add(itemMap)
                         }
-                        dataBinding.tvFollowInfo.text = "已选择${viewModel.followCount}单元"
+                        dataBinding.tvFollowInfo.text = "已选择${viewModel.followSet.size}单元"
                         return@setOnClickListener
                     }
-                    var saveType: String? = null
-                    if ("动词词组" == itemType) {
-                        saveType = "verb_phrase"
-                    } else if ("介词词组" == itemType) {
-                        saveType = "prep_phrase"
-                    } else if ("其他词组" == itemType) {
-                        saveType = "other_phrase"
-                    }
-                    val gson = Gson()
-                    val followsUnit: MutableMap<String, MutableList<String>> = mutableMapOf()
-                    val preferences =
-                        requireContext().getSharedPreferences("config", Context.MODE_PRIVATE)
-                    val edit = preferences.edit()
-                    val list = mutableListOf<String>()
-                    list.add(itemUnit!!)
-                    try {
-                        followsUnit[saveType!!] = list
-                        edit.putString("follows", gson.toJson(followsUnit))
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
 
-                    edit.apply()
-                    Toast.makeText(context, "切换到$itemType $itemUnit", Toast.LENGTH_SHORT).show()
-                    findNavController().popBackStack()
+                    viewModel.followSet.clear()
+                    viewModel.followSet.add(itemMap)
+                    viewModel.rebuild(false)
                 }
                 holder.itemView.setOnLongClickListener {
                     viewModel.actionModeLiveData.value =
@@ -222,8 +216,19 @@ class SelectFragment : Fragment() {
 
     private fun initListener() {
         dataBinding.btnSubmit.setOnClickListener {
-            Toast.makeText(context, "保存失败，系统尚未实现多选", Toast.LENGTH_SHORT).show()
-            findNavController().popBackStack()
+            Log.i("main",Gson().toJson(viewModel.followSet))
+            val dialog = AlertDialog.Builder(requireContext())
+                .setMessage("已学词组要重新学习吗？")
+                .setNegativeButton(
+                    "重新学习"
+                ) { p0, p1 ->
+                    viewModel.rebuild(true)
+                }
+                .setPositiveButton("继续学习"
+                ) { p0, p1 -> viewModel.rebuild(false) }.create()
+
+            dialog.show()
+
         }
     }
 
@@ -239,6 +244,15 @@ class SelectFragment : Fragment() {
                     dataBinding.blockSelect.visibility = View.VISIBLE
                     adapter.notifyDataSetChanged()
                 }
+            }
+        }
+
+        viewModel.signalLiveData.observe(viewLifecycleOwner){
+            if (it == null) {
+                return@observe
+            }
+            if (it == FragmentSelectViewModel.SIGNAL_SAVE_DONE) {
+                findNavController().popBackStack()
             }
         }
     }

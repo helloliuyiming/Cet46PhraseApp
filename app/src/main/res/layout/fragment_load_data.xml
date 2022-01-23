@@ -15,7 +15,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/view_load"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            tools:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -23,8 +24,7 @@
                 android:orientation="vertical"
                 android:paddingHorizontal="30dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="gone">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -56,12 +56,14 @@
             android:id="@+id/view_done"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone">
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:padding="30dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -69,11 +71,10 @@
                     android:id="@+id/tv_load_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
                     android:text="加载已完成，共加载1536条记录"
-                    android:textSize="24sp" />
+                    android:textSize="20sp" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_return"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

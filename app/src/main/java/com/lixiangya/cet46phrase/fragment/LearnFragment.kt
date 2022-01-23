@@ -138,12 +138,12 @@ class LearnFragment : Fragment(), View.OnClickListener {
                 }
                 val explain = viewModel.phraseLiveData.value!!.explains[position]
                 val dataBinding = holder.dataBinding
-                if (explain.examples.isNullOrEmpty()) {
+                if (explain!!.examples.isNullOrEmpty()) {
                     dataBinding.tvExampleEn.text = ""
                     dataBinding.tvExampleCn.text = ""
                 } else {
-                    dataBinding.tvExampleEn.text = explain.examples[0].en
-                    dataBinding.tvExampleCn.text = explain.examples[0].cn
+                    dataBinding.tvExampleEn.text = explain.examples[0]!!.en
+                    dataBinding.tvExampleCn.text = explain.examples[0]!!.cn
                 }
                 dataBinding.tvNumber.text = (position + 1).toString()
                 dataBinding.tvExplain.text = explain.explain
@@ -178,6 +178,12 @@ class LearnFragment : Fragment(), View.OnClickListener {
             actionBar.setDisplayHomeAsUpEnabled(true)
             actionBar.title = viewModel.phraseLiveData.value?.phrase
         }
+        if (viewModel.reviewModeSignal||viewModel.deepLinkSignal) {
+            dataBinding.normalView.visibility = View.GONE
+        }else{
+            dataBinding.normalView.visibility = View.VISIBLE
+            actionBar.setDisplayShowTitleEnabled(false)
+        }
     }
 
     private fun initListener() {
@@ -197,6 +203,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
             viewModel.editNoteLiveData.value = null
             dataBinding.floatingActionButton.hide()
         }
+
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -230,6 +237,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 return@setOnClickListener
             }
+
             if (viewModel.editNoteLiveData.value == null) {
                 val note = Note()
                 note.phrase = viewModel.phraseLiveData.value!!.phrase
@@ -339,11 +347,11 @@ class LearnFragment : Fragment(), View.OnClickListener {
                     dataBinding.tvWritePhrase.text = phrase.phrase
 
                     val explainPosition = random.nextInt(phrase.explains.size)
-                    if (phrase.explains[explainPosition].examples.isNotEmpty()) {
+                    if (phrase.explains[explainPosition]!!.examples.isNotEmpty()) {
                         dataBinding.btnWriteExample.text =
-                            phrase.explains[explainPosition].examples[0].en
+                            phrase.explains[explainPosition]!!.examples[0]!!.en
                         dataBinding.tvWriteAnswer.text =
-                            phrase.explains[explainPosition].examples[0].cn
+                            phrase.explains[explainPosition]!!.examples[0]!!.cn
                     }
                 }
                 else -> {

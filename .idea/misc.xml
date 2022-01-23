@@ -4,13 +4,18 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/bg_searchview.xml" value="0.2046875" />
+        <entry key="app/src/main/res/drawable/ic_add.xml" value="0.18020833333333333" />
+        <entry key="app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.24166666666666667" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25769927536231885" />
         <entry key="app/src/main/res/layout/fragment_ad.xml" value="0.1852355072463768" />
-        <entry key="app/src/main/res/layout/fragment_learn.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/fragment_load_data.xml" value="0.25769927536231885" />
+        <entry key="app/src/main/res/layout/fragment_learn.xml" value="0.36670547147846333" />
+        <entry key="app/src/main/res/layout/fragment_load_data.xml" value="0.35" />
         <entry key="app/src/main/res/layout/fragment_main.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_note_list.xml" value="0.26268115942028986" />
+        <entry key="app/src/main/res/layout/fragment_phrase_list.xml" value="0.1661600810536981" />
+        <entry key="app/src/main/res/layout/fragment_select.xml" value="0.1661600810536981" />
         <entry key="app/src/main/res/layout/item_note.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/item_phrase_note.xml" value="0.1" />
         <entry key="app/src/main/res/layout/item_phrase_unit.xml" value="0.26268115942028986" />
         <entry key="app/src/main/res/layout/section_drawer_header.xml" value="0.3416666666666667" />
         <entry key="app/src/main/res/xml/root_preferences.xml" value="0.26268115942028986" />

@@ -15,7 +15,51 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/primaryColor" />
+                android:background="@color/primaryColor" >
+                <LinearLayout
+                    android:id="@+id/normal_view"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_gravity="bottom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:textSize="10sp"
+                            android:text="新词"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/new_phrase_progress"
+                            android:text="7/15"
+                            android:layout_marginStart="8dp"
+                            android:textSize="18sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:textSize="10sp"
+                            android:text="复习"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/review_phrase_progress"
+                            android:text="10/120"
+                            android:textSize="18sp"
+                            android:layout_marginStart="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.appcompat.widget.Toolbar>
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -74,6 +118,7 @@
                             android:visibility="gone">
 
                             <LinearLayout
+                                android:background="#e1e1e1"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical">
@@ -88,6 +133,7 @@
 
                                 <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/rv_note"
+                                    android:padding="8dp"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="5dp" />
@@ -110,9 +156,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="50dp"
-                        android:text="TextView"
+                        tools:text="TextView"
                         android:textSize="28sp"
                         android:textStyle="bold"
+                        android:textAllCaps="false"
                         app:layout_constraintBottom_toTopOf="@+id/textView2"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.498"
@@ -186,7 +233,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="50dp"
                         android:layout_marginBottom="50dp"
-                        android:text="TextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextView"
+                        android:textAllCaps="false"
+                        tools:text="TextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextView"
                         android:textSize="18sp"
                         app:layout_constraintBottom_toTopOf="@+id/textView4"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -268,16 +316,20 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="#3498DB"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     android:text="记住了"
-                    android:textColor="@color/white" />
+                    android:textColor="@color/white"
+                    app:backgroundTint="#3498DB" />
 
                 <Button
                     android:id="@+id/action_unsure"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="#27AE60"
+                    android:backgroundTint="#27AE60"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     android:text="不确定"
                     android:textColor="@color/white" />
 
@@ -286,8 +338,10 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="#E74C3C"
+                    android:backgroundTint="#E74C3C"
                     android:text="不再出现"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     android:textColor="@color/white" />
             </LinearLayout>
         </LinearLayout>
@@ -351,14 +405,14 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floating_action_button"
-            app:maxImageSize="70dp"
             android:layout_width="wrap_content"
+            app:fabSize="auto"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_marginEnd="16sp"
-            android:layout_marginBottom="60dp"
+            android:layout_marginBottom="64dp"
             app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
-            app:srcCompat="@drawable/ic_add"/>
+            app:srcCompat="@drawable/ic_baseline_add_24"/>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>

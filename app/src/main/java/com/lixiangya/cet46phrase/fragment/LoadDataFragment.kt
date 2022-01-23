@@ -1,6 +1,5 @@
 package com.lixiangya.cet46phrase.fragment
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,8 +11,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.lixiangya.cet46phrase.R
 import com.lixiangya.cet46phrase.databinding.FragmentLoadDataBinding
+import com.lixiangya.cet46phrase.util.PreferencesUtil
 import com.lixiangya.cet46phrase.viewmodel.FragmentLoadDataViewModel
-
 
 class LoadDataFragment : Fragment() {
 
@@ -22,7 +21,7 @@ class LoadDataFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(FragmentLoadDataViewModel::class.java)
+        viewModel = ViewModelProvider(this)[FragmentLoadDataViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -46,8 +45,9 @@ class LoadDataFragment : Fragment() {
             Log.e("main", "load ERROR:${it.message}")
             it.printStackTrace()
         }, {
+
             val sharedPreferences =
-                requireContext().getSharedPreferences("config", Context.MODE_PRIVATE)
+                PreferencesUtil.getSharePreferences(requireContext())
             val edit = sharedPreferences.edit()
             edit.putBoolean("init", true)
             edit.apply()
@@ -70,4 +70,5 @@ class LoadDataFragment : Fragment() {
     private fun onSubscribe() {
 
     }
+
 }
