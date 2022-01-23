@@ -75,6 +75,7 @@ class LearnFragment : Fragment(), View.OnClickListener {
         initListener()
         onSubscribe()
         viewModel.load()
+        dataBinding.viewModel = viewModel
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -281,12 +282,11 @@ class LearnFragment : Fragment(), View.OnClickListener {
             }
 
             viewModel.loadNote(it.phrase)
-            if (it.last) {
-                viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_WRITE
-            } else if (it.score < 3) {
-                viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_SHOW
-            } else {
-                viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_TEST
+
+            when (it.step) {
+                1-> viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_SHOW
+                2-> viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_TEST
+                3-> viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_WRITE
             }
         }
 
@@ -295,7 +295,6 @@ class LearnFragment : Fragment(), View.OnClickListener {
             val phrase = viewModel.phraseLiveData.value!!
             when (it) {
                 FragmentLearnViewModel.VIEW_TYPE_SHOW -> {
-
                     dataBinding.viewShow.visibility = View.VISIBLE
                     dataBinding.viewTest.visibility = View.GONE
                     dataBinding.viewWrite.visibility = View.GONE
@@ -415,39 +414,35 @@ class LearnFragment : Fragment(), View.OnClickListener {
         if (v == null) return
         when (v.id) {
             dataBinding.actionOk.id -> {
-                viewModel.phraseLiveData.value!!.score = 3
-                viewModel.phraseLiveData.value!!.last = false
+                viewModel.phraseLiveData.value!!.step=2
                 viewModel.next()
             }
             dataBinding.actionUnsure.id -> {
-                viewModel.phraseLiveData.value!!.score = viewModel.phraseLiveData.value!!.score + 1
-                viewModel.phraseLiveData.value!!.last = false
+                viewModel.phraseLiveData.value!!.step=1
+                viewModel.phraseLiveData.value!!.score--
                 viewModel.next()
             }
             dataBinding.actionSkip.id -> {
-                viewModel.phraseLiveData.value!!.score = 3
-                viewModel.phraseLiveData.value!!.last = true
+                viewModel.phraseLiveData.value!!.step=3
                 viewModel.next()
             }
             dataBinding.btnTestDontKnow.id -> {
-                viewModel.phraseLiveData.value!!.score = viewModel.phraseLiveData.value!!.score - 2
-                viewModel.phraseLiveData.value!!.last = false
+                viewModel.phraseLiveData.value!!.score-=2
+                viewModel.phraseLiveData.value!!.step=1
                 viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_SHOW
             }
             dataBinding.btnTestKnow.id -> {
-                viewModel.phraseLiveData.value!!.score = 3
-                viewModel.phraseLiveData.value!!.last = true
+                viewModel.phraseLiveData.value!!.step = 3
                 viewModel.next()
             }
             dataBinding.btnWriteDont.id -> {
-                viewModel.phraseLiveData.value!!.score = 1
-                viewModel.phraseLiveData.value!!.last = false
+                viewModel.phraseLiveData.value!!.score --
+                viewModel.phraseLiveData.value!!.step=2
                 viewModel.viewTypeLiveData.value = FragmentLearnViewModel.VIEW_TYPE_SHOW
             }
             dataBinding.btnWriteDo.id -> {
                 viewModel.pass()
             }
-
         }
     }
 

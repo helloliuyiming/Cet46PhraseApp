@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="viewModel"
+            type="com.lixiangya.cet46phrase.viewmodel.FragmentLearnViewModel" />
+    </data>
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -16,46 +22,54 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/primaryColor" >
+
                 <LinearLayout
                     android:id="@+id/normal_view"
-                    android:orientation="vertical"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
                     <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_gravity="bottom"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:orientation="horizontal">
+
                         <TextView
-                            android:textSize="10sp"
-                            android:text="新词"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content"
+                            android:text="新词"
+                            android:textSize="10sp" />
+
                         <TextView
                             android:id="@+id/new_phrase_progress"
-                            android:text="7/15"
-                            android:layout_marginStart="8dp"
-                            android:textSize="18sp"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            tools:text="7/15"
+                            android:text="@{viewModel.newPhraseProgressObservableField}"
+                            android:textSize="18sp" />
                     </LinearLayout>
 
                     <LinearLayout
-                        android:orientation="horizontal"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
                         <TextView
-                            android:textSize="10sp"
-                            android:text="复习"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content"
+                            android:text="复习"
+                            android:textSize="10sp" />
+
                         <TextView
                             android:id="@+id/review_phrase_progress"
-                            android:text="10/120"
-                            android:textSize="18sp"
-                            android:layout_marginStart="8dp"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            tools:text="10/120"
+                            android:text="@{viewModel.reviewPhraseProgressObservableField}"
+                            android:textSize="18sp" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -148,7 +162,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:visibility="gone"
-                    tools:visibility="gone">
+                    tools:visibility="visible">
 
                     <Button
                         android:id="@+id/btn_test_phrase"
@@ -156,14 +170,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="50dp"
-                        tools:text="TextView"
+                        android:textAllCaps="false"
                         android:textSize="28sp"
                         android:textStyle="bold"
-                        android:textAllCaps="false"
                         app:layout_constraintBottom_toTopOf="@+id/textView2"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.498"
                         app:layout_constraintStart_toStartOf="parent"
+                        tools:text="TextView"
                         tools:visibility="visible" />
 
                     <TextView
@@ -182,28 +196,33 @@
                         android:id="@+id/btn_test_dont_know"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:background="#BDC3C7"
+                        android:backgroundTint="#BDC3C7"
                         android:text="不认识"
+                        app:cornerRadius="0dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
                         android:textColor="@color/white"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/btn_test_know"
-                         />
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/btn_test_know" />
 
                     <Button
                         android:id="@+id/btn_test_know"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:background="#2ECC71"
+                        android:backgroundTint="#2ECC71"
+                        app:cornerRadius="0dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
                         android:text="认识"
                         android:textColor="@color/white"
                         app:layout_constraintBottom_toBottomOf="@+id/btn_test_dont_know"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/btn_test_dont_know"
 
 
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
                         tools:visibility="visible" />
 
                     <TextView
@@ -224,7 +243,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:visibility="gone"
-                    tools:visibility="visible">
+                    tools:visibility="gone">
 
                     <Button
                         android:id="@+id/btn_write_example"
@@ -234,11 +253,11 @@
                         android:layout_marginHorizontal="50dp"
                         android:layout_marginBottom="50dp"
                         android:textAllCaps="false"
-                        tools:text="TextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextView"
                         android:textSize="18sp"
                         app:layout_constraintBottom_toTopOf="@+id/textView4"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        tools:text="TextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextView" />
 
                     <TextView
                         android:id="@+id/textView4"
@@ -256,8 +275,11 @@
                         android:id="@+id/btn_write_dont"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:background="#95A5A6"
+                        android:backgroundTint="#95A5A6"
                         android:text="不可以"
+                        app:cornerRadius="0dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
                         android:textColor="@color/white"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -270,7 +292,10 @@
                         android:id="@+id/btn_write_do"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:background="#2ECC71"
+                        android:backgroundTint="#2ECC71"
+                        app:cornerRadius="0dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
                         android:text="可以"
                         android:textColor="@color/white"
                         app:layout_constraintBottom_toBottomOf="@+id/btn_write_dont"
@@ -319,12 +344,14 @@
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
                     android:text="记住了"
+                    app:cornerRadius="0dp"
                     android:textColor="@color/white"
                     app:backgroundTint="#3498DB" />
 
                 <Button
                     android:id="@+id/action_unsure"
                     android:layout_width="0dp"
+                    app:cornerRadius="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:backgroundTint="#27AE60"
@@ -341,6 +368,7 @@
                     android:backgroundTint="#E74C3C"
                     android:text="不再出现"
                     android:insetTop="0dp"
+                    app:cornerRadius="0dp"
                     android:insetBottom="0dp"
                     android:textColor="@color/white" />
             </LinearLayout>

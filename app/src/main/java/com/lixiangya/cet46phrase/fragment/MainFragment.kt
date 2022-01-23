@@ -48,7 +48,7 @@ class MainFragment : Fragment() {
         val product = "ca-app-pub-3935377231710978/3797839318"
         RewardedAd.load(requireContext(),product, adRequest, object : RewardedAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
-                Log.d(TAG, "adLoad failure:"+adError.message)
+                Log.e(TAG, "adLoad failure:"+adError.message)
                 mRewardedAd = null
             }
 
@@ -79,25 +79,6 @@ class MainFragment : Fragment() {
         viewModel.load()
         checkFollow()
         unitAdapter.notifyDataSetChanged()
-
-        mRewardedAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
-            override fun onAdShowedFullScreenContent() {
-                // Called when ad is shown.
-                Log.d(TAG, "Ad was shown.")
-            }
-
-            override fun onAdFailedToShowFullScreenContent(adError: AdError?) {
-                // Called when ad fails to show.
-                Log.d(TAG, "Ad failed to show.")
-            }
-
-            override fun onAdDismissedFullScreenContent() {
-                // Called when ad is dismissed.
-                // Set the ad reference to null so you don't show the ad a second time.
-                Log.d(TAG, "Ad was dismissed.")
-                mRewardedAd = null
-            }
-        }
 
     }
 

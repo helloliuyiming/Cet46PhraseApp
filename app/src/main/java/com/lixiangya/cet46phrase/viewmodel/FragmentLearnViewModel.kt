@@ -4,16 +4,19 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.databinding.ObservableField
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.lixiangya.cet46phrase.entity.Note
 import com.lixiangya.cet46phrase.entity.Phrase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.lixiangya.cet46phrase.algorithm.SM2
 import com.lixiangya.cet46phrase.util.PreferencesUtil
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.RealmAny
@@ -31,6 +34,14 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     var completedLiveData: MutableLiveData<Int> = MutableLiveData(0)
     var done = false
 
+    val newPhraseProgressObservableField:ObservableField<String> = ObservableField()
+    val reviewPhraseProgressObservableField:ObservableField<String> = ObservableField()
+
+    private var newPhraseTotal = 0
+    private var reviewPhraseTotal = 0
+    private var newPhraseDone = 0
+    private var reviewPhraseDone = 0
+
     private val context = application
     private val phraseQueue: Queue<Phrase> = LinkedList<Phrase>()
     private val activePhraseQueue: Queue<Phrase> = LinkedList<Phrase>()
@@ -43,7 +54,6 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
             return
         }
         if (phraseListLiveData.value != null) {
-//            phraseListLiveData.value = phraseListLiveData.value
             next()
             return
         }
@@ -56,9 +66,10 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
             if (!reviewModeSignal) {
                 val newPhraseRealm = realm.where(Phrase::class.java)
                     .equalTo("isActive", true)
-                    .equalTo("level", "0".toInt())
+                    .equalTo("reviewDate", RealmAny.nullValue())
                     .findAll()
                 newPhrase = realm.copyFromRealm(newPhraseRealm)
+                newPhraseTotal = newPhrase.size
                 if (!order) {
                     newPhrase.shuffle()
                 }
@@ -69,7 +80,7 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
                 .findAll()
 
             val reviewPhrase:MutableList<Phrase> = realm.copyFromRealm(reviewListRealm)
-
+            reviewPhraseTotal = reviewPhrase.size
 
             val newSize = newPhrase.size
             val reviewSize = reviewPhrase.size
@@ -108,10 +119,6 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
             }
             phraseListLiveData.postValue(list)
             list.forEach {
-                if (reviewModeSignal) {
-                    it.score = 3
-                    it.last = false
-                }
                 if (activePhraseQueue.size < 11) {
                     activePhraseQueue.offer(it)
                 } else {
@@ -119,6 +126,7 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
                 }
             }
             it.onSuccess(true)
+            updateProgress()
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -184,6 +192,36 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
     }
 
     fun pass() {
+
+        val phrase = phraseLiveData.value!!
+
+        if (phrase.reviewDate == null) {
+            newPhraseDone++
+        }else{
+            reviewPhraseDone++
+        }
+        updateProgress()
+
+        var quality:Int = if (phrase.score >= 10) {
+            5
+        }else if (phrase.score >= 8) {
+            4
+        }else if (phrase.score >= 6) {
+            3
+        }else if (phrase.score >= 4) {
+            2
+        }else if (phrase.score >= 2) {
+            1
+        }else{
+            0
+        }
+
+        val reviewDate = SM2.calculateSuperMemo2Algorithm(phrase, quality)
+        phrase.reviewDate = Date(reviewDate)
+        phrase.repetition++
+        phrase.step = 2
+        phrase.score = 10
+        updatePhrase(phrase)
         //TODO 计算下次复习时间
         if (activePhraseQueue.size == 0 && phraseQueue.size == 0) {
             done = true
@@ -207,7 +245,23 @@ class FragmentLearnViewModel(application: Application) : AndroidViewModel(applic
 
     }
 
-    fun save() {
+    private fun updateProgress(){
+        newPhraseProgressObservableField.set("$newPhraseDone / $newPhraseTotal")
+        reviewPhraseProgressObservableField.set("$reviewPhraseDone / $reviewPhraseTotal")
+    }
+    private fun updatePhrase(phrase: Phrase) {
+        Single.create<Phrase> {
+            val realm = Realm.getDefaultInstance()
+            realm.executeTransaction {
+                realm.insertOrUpdate(phrase)
+            }
+            realm.close()
+            it.onSuccess(phrase)
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(Consumer {
+                Log.i("main","${it.phrase}保存成功，下次复习时间${it.reviewDate}")
+            })
 
     }
 
