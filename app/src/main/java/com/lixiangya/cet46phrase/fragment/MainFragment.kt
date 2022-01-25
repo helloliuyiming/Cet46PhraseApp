@@ -15,7 +15,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.ads.*
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
@@ -40,15 +42,36 @@ class MainFragment : Fragment() {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[FragmentMainViewModel::class.java]
         setHasOptionsMenu(true)
+        initRewardedAd()
+    }
 
-
+    private fun initRewardedAd(){
         val adRequest = AdRequest.Builder().build()
 
         val test = "ca-app-pub-3940256099942544/5224354917"
         val product = "ca-app-pub-3935377231710978/3797839318"
-        RewardedAd.load(requireContext(),product, adRequest, object : RewardedAdLoadCallback() {
-            override fun onAdFailedToLoad(adError: LoadAdError) {
-                Log.e(TAG, "adLoad failure:"+adError.message)
+        RewardedAd.load(requireContext(),test, adRequest, object : RewardedAdLoadCallback() {
+            override fun onAdFailedToLoad(error: LoadAdError) {
+                Log.e(TAG, "adLoad failure:"+error.message)
+                // Gets the domain from which the error came.
+                val errorDomain = error.domain
+                // Gets the error code. See
+                // https://developers.google.com/android/reference/com/google/android/gms/ads/AdRequest#constant-summary
+                // for a list of possible codes.
+                val errorCode = error.code
+                // Gets an error message.
+                // For example "Account not approved yet". See
+                // https://support.google.com/admob/answer/9905175 for explanations of
+                // common errors.
+                val errorMessage = error.message
+                // Gets additional response information about the request. See
+                // https://developers.google.com/admob/android/response-info for more
+                // information.
+                val responseInfo = error.responseInfo
+                // Gets the cause of the error, if available.
+                val cause = error.cause
+                // All of this information is available via the error's toString() method.
+                Log.d(TAG, error.toString())
                 mRewardedAd = null
             }
 
@@ -59,7 +82,6 @@ class MainFragment : Fragment() {
         })
 
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
