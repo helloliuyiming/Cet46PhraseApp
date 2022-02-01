@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "470187299454",
+    "project_id": "cet46phrase",
+    "storage_bucket": "cet46phrase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470187299454:android:2711e11848f5bb2799be2f",
+        "android_client_info": {
+          "package_name": "com.lixiangya.cet46phrase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "470187299454-kmbbe3co6l8sv0m7t90ge1chcd5r6uf2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAm4NpZ1QuWdLZjBkBpAuIyy-vezatMf4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "470187299454-kmbbe3co6l8sv0m7t90ge1chcd5r6uf2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

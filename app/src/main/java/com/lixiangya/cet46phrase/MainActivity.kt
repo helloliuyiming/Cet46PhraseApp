@@ -14,6 +14,7 @@ import com.google.gson.Gson
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
+import java.lang.RuntimeException
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -26,7 +27,6 @@ class MainActivity : AppCompatActivity() {
             application, "65bdda75-3028-4229-9956-be5cf3299805",
             Analytics::class.java, Crashes::class.java
         )
-
     }
 
 
