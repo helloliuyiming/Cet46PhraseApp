@@ -7,10 +7,7 @@ import android.content.pm.Signature
 import android.os.Build
 import android.util.Base64
 import android.util.Log
-import android.widget.Toast
 import cn.hutool.crypto.digest.MD5
-import com.google.android.gms.ads.MobileAds
-import com.google.gson.Gson
 import com.lixiangya.cet46phrase.util.PreferencesUtil
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -72,11 +69,11 @@ class MyApplication : Application() {
             signature = packageInfo.signatures[0]
         }
         val signatureByteArray = signature.toByteArray()
-        Log.i("main","signaturePlainText = ${String(signatureByteArray)}")
+//        Log.i("main","signaturePlainText = ${String(signatureByteArray)}")
         val mD5 = MD5.create()
         val digestHex16 = mD5.digestHex16(signatureByteArray)
-        Log.i("main","app signature md5 = $digestHex16")
-        Toast.makeText(this,"app signature md5 = $digestHex16",Toast.LENGTH_LONG).show()
+//        Log.i("main","app signature md5 = $digestHex16")
+//        Toast.makeText(this,"app signature md5 = $digestHex16",Toast.LENGTH_LONG).show()
 
         val md: MessageDigest = MessageDigest.getInstance("SHA1")
         val publicKey: ByteArray = md.digest(signatureByteArray)
@@ -87,21 +84,21 @@ class MyApplication : Application() {
             hexString.append(appendString)
             hexString.append(":")
         }
-        Log.i("main","app signature sha1 = $hexString")
+//        Log.i("main","app signature sha1 = $hexString")
     }
 
     private fun initAdMod() {
 //        Log.i("main","开始初始化广告")
 //        val build = RequestConfiguration.Builder()
-//            .setTestDeviceIds(Arrays.asList("C6C432BF02AF0624F1B24690DF3B51E0","745DCA27DECA48ABDF712821EFC57A3A")).build()
+//            .setTestDeviceIds(listOf("C6C432BF02AF0624F1B24690DF3B51E0","745DCA27DECA48ABDF712821EFC57A3A")).build()
 //        MobileAds.setRequestConfiguration(build)
 //
 //        val adRequest = AdRequest.Builder().build()
 //        Log.i("main","测试设备？${adRequest.isTestDevice(this)}")
-        MobileAds.initialize(this){
-            Log.d("main", "initAdsense() called")
-            Log.i("main", Gson().toJson(it.adapterStatusMap))
-        }
+//        MobileAds.initialize(this){
+//            Log.d("main", "initAdsense() called")
+//            Log.i("main", Gson().toJson(it.adapterStatusMap))
+//        }
     }
 
     external fun loadKey():String

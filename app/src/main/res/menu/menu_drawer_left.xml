@@ -2,11 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/menu_item_ad"
-        android:icon="@drawable/ic_baseline_wb_sunny_24"
-        android:title="激励广告" />
-
-    <item
         android:id="@+id/menu_item_notes"
         android:icon="@drawable/ic_baseline_event_note_24"
         android:title="笔记"/>

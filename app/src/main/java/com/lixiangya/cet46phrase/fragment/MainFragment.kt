@@ -15,12 +15,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.OnUserEarnedRewardListener
-import com.google.android.gms.ads.rewarded.RewardItem
-import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.lixiangya.cet46phrase.R
 import com.lixiangya.cet46phrase.databinding.FragmentMainBinding
 import com.lixiangya.cet46phrase.databinding.ItemPhraseSearchBinding
@@ -35,53 +29,14 @@ class MainFragment : Fragment() {
     lateinit var unitAdapter: RecyclerView.Adapter<PhraseUnitViewHolder>
     lateinit var searchAdapter: RecyclerView.Adapter<SearchPhraseViewHolder>
 
-    private var mRewardedAd: RewardedAd? = null
     val TAG = "main"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[FragmentMainViewModel::class.java]
         setHasOptionsMenu(true)
-        initRewardedAd()
     }
 
-    private fun initRewardedAd(){
-        val adRequest = AdRequest.Builder().build()
-
-        val test = "ca-app-pub-3940256099942544/5224354917"
-        val product = "ca-app-pub-3935377231710978/3797839318"
-        RewardedAd.load(requireContext(),test, adRequest, object : RewardedAdLoadCallback() {
-            override fun onAdFailedToLoad(error: LoadAdError) {
-                Log.e(TAG, "adLoad failure:"+error.message)
-                // Gets the domain from which the error came.
-                val errorDomain = error.domain
-                // Gets the error code. See
-                // https://developers.google.com/android/reference/com/google/android/gms/ads/AdRequest#constant-summary
-                // for a list of possible codes.
-                val errorCode = error.code
-                // Gets an error message.
-                // For example "Account not approved yet". See
-                // https://support.google.com/admob/answer/9905175 for explanations of
-                // common errors.
-                val errorMessage = error.message
-                // Gets additional response information about the request. See
-                // https://developers.google.com/admob/android/response-info for more
-                // information.
-                val responseInfo = error.responseInfo
-                // Gets the cause of the error, if available.
-                val cause = error.cause
-                // All of this information is available via the error's toString() method.
-                Log.d(TAG, error.toString())
-                mRewardedAd = null
-            }
-
-            override fun onAdLoaded(rewardedAd: RewardedAd) {
-                Log.d(TAG, "Ad was loaded.")
-                mRewardedAd = rewardedAd
-            }
-        })
-
-    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -346,21 +301,6 @@ class MainFragment : Fragment() {
 
         dataBinding.navigationView.setNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.menu_item_ad -> {
-                    if (mRewardedAd != null) {
-                        Log.i(TAG, "initListener: showAD")
-                        mRewardedAd?.show(requireActivity(), OnUserEarnedRewardListener() {
-                            fun onUserEarnedReward(rewardItem: RewardItem) {
-                                var rewardAmount = rewardItem.amount
-                                var rewardType = rewardItem.type
-                                Log.d(TAG, "User earned the reward.")
-                            }
-                        })
-                    } else {
-                        Toast.makeText(context,"Thank you for supporting us,Something is wrong, please retry again later!",Toast.LENGTH_SHORT).show()
-                        Log.d(TAG, "The rewarded ad wasn't ready yet.")
-                    }
-                }
                 R.id.menu_item_notes -> {
                     findNavController().navigate(R.id.noteListFragment)
                 }
