@@ -45,7 +45,6 @@ class LoadDataFragment : Fragment() {
             Log.e("main", "load ERROR:${it.message}")
             it.printStackTrace()
         }, {
-
             val sharedPreferences =
                 PreferencesUtil.getSharePreferences(requireContext())
             val edit = sharedPreferences.edit()
